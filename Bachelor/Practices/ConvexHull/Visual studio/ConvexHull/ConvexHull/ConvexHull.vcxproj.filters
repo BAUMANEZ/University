@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\DataStructures">
+      <UniqueIdentifier>{12e5d20e-1635-4b22-a1db-58a16cdddc51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Algorithms">
+      <UniqueIdentifier>{46899b8d-800c-497f-bb90-a0a9593a79c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Helpers">
+      <UniqueIdentifier>{14c7e5a9-d384-44e5-973a-db603595d758}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ConvexHull.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PointPair.cpp">
+      <Filter>Исходные файлы\DataStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>Исходные файлы\DataStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="HandleFiles.cpp">
+      <Filter>Исходные файлы\DataStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="DataModule.cpp">
+      <Filter>Исходные файлы\DataStructures</Filter>
+    </ClCompile>
+    <ClCompile Include="KirkpatrickSeidelAlgorithm.cpp">
+      <Filter>Исходные файлы\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="NonEffectiveAlgorithm.cpp">
+      <Filter>Исходные файлы\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="PointsGenerator.cpp">
+      <Filter>Исходные файлы\Helpers</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

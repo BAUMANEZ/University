@@ -1,0 +1,782 @@
+\documentclass[12pt,a4paper]{article} 
+
+\usepackage{fn2kursstyle}
+\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc} 
+\usepackage[utf8]{inputenc} 
+\usepackage{geometry}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage[hidelinks]{hyperref}
+
+\counterwithout{equation}{section}
+\counterwithout{figure}{section}
+\graphicspath{{pic/}}
+\frenchspacing 
+
+\makeatletter
+\newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+
+\title{МАТЕМАТИЧЕСКОЕ МОДЕЛИРОВАНИЕ ТЕРМОУПРУГОГО РАЗРУШЕНИЯ ХРУПКОГО МАТЕРИАЛА}
+\group{ФН2-52Б}
+\author{А.\,И.~Токарев}
+\supervisor{М.\,П.~Галанин}
+\date{2021}
+
+\DeclareMathOperator{\Tr}{tr}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\makeatletter
+\newenvironment{sqcases}{%
+  \matrix@check\sqcases\env@sqcases
+}{%
+  \endarray\right.%
+}
+\def\env@sqcases{%
+  \let\@ifnextchar\new@ifnextchar
+  \left\lbrack
+  \def\arraystretch{1.2}%
+  \array{@{}l@{\quad}l@{}}%
+}
+\makeatother
+
+\makeatletter
+\newcommand{\oset}[3][0ex]{%
+  \mathrel{\mathop{#3}\limits^{
+    \vbox to#1{\kern-2\ex@
+    \hbox{$\scriptstyle#2$}\vss}}}}
+\makeatother
+
+\begin{document}
+    \maketitle
+    \tableofcontents
+    \pagebreak
+
+    \section-{Введение}
+    
+    Анализ прочности является очень важной задачей при проверке работоспособности конструкций. Вот почему задача разрушения является очень актуальной. Стоит отметить, что она еще не так подробно исследована и вызывает немало трудностей при моделировании, так как необходимо учитывать внешние условия, структуру материала, нагрузки, существование внутренних дефектов и т.д.
+    
+    Разрушунием называют процесс нарушения целостности конструкции, происходящее вследствие изменения формы и накопления повреждений. Наиболее опасные области, инициализирующие процесс разрушения, -- трещины. Основная цель задачи прочности -- предсказание различных сценариев развития разрушения.
+
+    Выделяют всего два типа разрушения: хрупкое и вязкое. При хрупком разрушении размер области пластической деформации пренебрежимо мал в сравнении с размером трещины, и оно неразрывно связано с процессом накопления рассеянных повреждений и распространения изолированных трещин.
+
+    В процессе разрушения возникают либо рассеянные дефекты, либо многочисленные. Хрупкое разрушение провоцирует появление многочисленных трещин, сопоставимых с размерами тела, их будем называть магистральными трещинами. В области нашего интереса лежат модели, которые учитывают накопление повреждений перед появлением магистральной трещины, а также ее развития. Вот почему более интересным в случае хрупкого разрушения является эффективный подход, который дает возможность наблюдать за изменением напряженно-деформированного состояния тела. 
+
+    Одним из интересных примеров задач прочности -- моделирование разрушения топливных таблеток в ядерных реакторах (диоксид урана $U O_2$), которые располагаются внутри герметично закрытых тепловыделяющих элементов, которые называют ТВЭЛами. 
+    
+    Целью работы является построение одномерной модели разрушения стержня, состоящего из диоксида урана, а также решение задачи термоупругости с помощью разностной схемы.
+
+    \section{Постановка задачи}
+
+    В трехмерном пространстве тензор второго ранга проще всего представить как матрицу, заданную в каждой точке пространства и описывающую неоднородность (в твердых телах -- шереховатости, потертости, микротрещины) этого пространства. Тензор, действуя на входящий вектор, изменяет его направление и масштаб. В общем случае напряжения и деформации также описываются тензорами второго ранга. 
+
+    \subsection{Тензор малых деформаций Коши}
+
+    Под действием внешних сил в твердом теле возникают деформации, иными словам -- изменение его формы и объема. Если разбить тело на систему точек $X_i(x_1 \ldots x_n)$, а также задать радиус-вектор $\vec r_i$ = $\vec r(X_i)$ = $\vec r(x_1 \ldots x_n)$ для каждой из них, причем
+    \[
+        r_i = \Bigl[ \, \displaystyle \sum_{k = 1}^{n} (x_j - 0)^2 \, \Bigr]^\frac{1}{2} = \Bigl[ \, \displaystyle \sum_{k = 1}^{n} x_j^2 \, \Bigr]^\frac{1}{2},
+    \]
+
+    \noindent то деформацию $\vec u$ (вектор деформации, вектор смещения)$[1]$ тела в каждой точке можно определить, как разницу между положением до и после приложения силы:
+    \begin{equation}
+      \vec u(u_1 \ldots u_n) = \vec r(X_i^') - \vec r(X_i) = \vec r^{\, '} - \vec r.
+      \label{shift}
+    \end{equation}
+
+    Рассмотрим две соседние бесконечно близкие точки, тогда разность расстояния между ними до начала процесса деформации задается величиной $dX$, а после -- $dX^'$. Воспользовавшись определением вектора деформации (\refeq{shift}) получим
+    \[
+      dX^' = dX + du \Rightarrow dx_k^' = dx_k + du_k,
+    \]
+
+    \noindent а расстояния $dl$ и $dl^'$ между заданными точками до и после деформации соответственно вычисляются по определению: 
+    \[
+        \begin{split}
+          dl &= \Bigl[ \, \displaystyle \sum_{k = 1}^{n} (dx_k)^2 \, \Bigr]^\frac{1}{2} \\
+          dl^' &= \Bigl[ \, \displaystyle \sum_{k = 1}^{n} (dx_k^')^2 \, \Bigr]^\frac{1}{2} = \Bigl[ \, \displaystyle \sum_{k = 1}^{n} (dx_k + du_k)^2 \, \Bigr]^\frac{1}{2}
+        \end{split}
+    \]
+
+    По определению полного дифференциала $du_k = \displaystyle \sum_{l = 1}^{n} \dfrac{\partial u_k}{\partial x_l} dx_l$. Дадим конкретный физический смысл полученной величине.  
+
+    Пусть $ x_1 = x,\, x_2 = y,\, x_3 = z $, а координаты вектора смещения зададим, как $ u = u(u_1, u_2, u_3)$, тогда 
+    \[
+      \begin{split}
+        du_1 &= \dfrac{\partial u_1}{\partial x}dx + \dfrac{\partial u_1}{\partial y}dy + \dfrac{\partial u_1}{\partial z}dz = \Delta_{11}dx + \Delta_{12}dy + \Delta_{13}dz,  \\[0.7em]
+        du_2 &= \dfrac{\partial u_2}{\partial x}dx + \dfrac{\partial u_2}{\partial y}dy + \dfrac{\partial u_2}{\partial z}dz = \Delta_{21}dx + \Delta_{22}dy + \Delta_{23}dz, \\[0.7em]
+        du_3 &= \dfrac{\partial u_3}{\partial x}dx + \dfrac{\partial u_3}{\partial y}dy + \dfrac{\partial u_3}{\partial z}dz = \Delta_{31}dx + \Delta_{32}dy + \Delta_{33}dz. \\
+      \end{split}
+    \]
+
+    Пусть деформация происходит только в направлении $x$, значит $dy = dz = 0$ и тогда 
+    \[
+      \begin{split}
+        du_1 &= \dfrac{\partial u_1}{\partial x}dx = \Delta_{11}dx, \\[0.7em]
+        du_2 &= \dfrac{\partial u_2}{\partial x}dx = \Delta_{21}dx, \\[0.7em]
+        du_3 &= \dfrac{\partial u_3}{\partial x}dx = \Delta_{31}dx.
+      \end{split}
+    \]
+    
+    Величина $ \Delta_{11} $ -- это растяжение (сжатие) отрезка $dx$, спроецированного на ось $x$. Аналогичным образом определяются $\Delta_{22}, \Delta_{33}$ растяжения (сжатия) вдоль осей \nolinebreak{$y, z$}
+
+    Компоненты $\Delta_{21},\, \Delta_{31}$ определяют поворот параллельно оси $x$: в первом случае -- вокруг оси $z$ в сторону $y$ (против часовой стрелки), а во втором -- вокруг оси $y$ в сторону оси $z$ (против часовой стрелки). 
+    
+    Если деформация происходит по всем направлениям, то $\Delta_{12}$ определяет поворот параллельно оси $y$ вокруг оси $z$ в направлении $x$ (по часовой стрелке), а $ \Delta_{13} $ -- вокруг оси $y$ в направлении оси $x$ (по часовой стрелке). Компоненты $\Delta_{23}, \Delta_{32}$ определяют повороты вокруг оси $z$: в первом случае -- в направлении оси $y$ (по часовой стрелке), во втором -- в направлении $z$ (против часовой стрелки). Пример деформации приведен на рис. \ref{fig:deform}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.5\textwidth]{deform.jpeg}
+      \caption{Процесс деформации}
+      \label{fig:deform}
+    \end{figure}
+    
+    Используя все проделанные раннее рассуждения, преобразуем элемент расстояния $(dl^')^2$ к виду:
+    \[
+      \begin{split}
+        (dl^')^2 &= (dl)^2 + 2 \displaystyle \sum_{k = 1}^{n} dx_k du_k + \displaystyle \sum_{j = 1}^{n} (du_k)^2 = (dl_i)^2 + 2 \displaystyle \sum_{k = 1}^{n} \displaystyle \sum_{l = 1}^{n} \dfrac{\partial u_k}{\partial x_l} dx_l dx_k \, + \\
+        &+ \displaystyle \sum_{k = 1}^{n} \displaystyle \sum_{l = 1}^{n} \Bigl(\dfrac{\partial u_k}{\partial x_l} dx_l \Bigr)^2
+      \end{split}
+    \]
+
+    Запишем в более лаконичном виде:
+    \begin{equation}
+      \begin{split}
+        (dl^')^2 &= (dl)^2 + 2 \dfrac{\partial u_k}{\partial x_l} dx_l dx_k + \Bigl(\dfrac{\partial u_k}{\partial x_l} dx_l \Bigr)^2
+      \end{split}
+    \end{equation}
+
+    При малых деформациях третьим слагаемым можно пренебречь в силу его большего порядка малости. 
+
+    Во втором слагаемом индексы $j, k$ являются немыми, поэтому его можно записать в симметричном виде
+    \begin{equation}
+      \dfrac{\partial u_k}{\partial x_l} dx_l dx_k = \dfrac{1}{2} \Bigl( \dfrac{\partial u_k}{\partial x_l} + \dfrac{\partial u_l}{\partial x_k} \Bigr)dx_l dx_k = \varepsilon_{kl} dx_l dx_k,
+      \label{deformTensorComponent}
+    \end{equation}
+    \noindent где $\varepsilon_{kl}$ -- составляющая тензора деформаций в точке $X$. 
+    
+    В предположении существования аддитивного разложения компонент тензора деформаций Коши запишем:
+    \[
+      \varepsilon_{kl} = \dfrac{1}{2}\Bigl( \dfrac{\partial u_k}{\partial x_l} + \dfrac{\partial u_l}{\partial x_k} \Bigr) = \varepsilon_{kl}^e +  \varepsilon_{kl}^0, \quad k, l = 1, 2, 3,
+    \]
+    \noindent где $\varepsilon_{kl}^e$ -- компоненты упругой состовляющей тензора деформаций, а $ \varepsilon_{kl}^0 $ -- компоненты тенхора неупругих деформаций среду (в нашем случае температурные деформации).
+    
+    Термоупругость описывает деформации при неравномерном нагреве деформируемых тел. Термоупругое тело обладает хотя бы одним естественным состоянием, в котором отсутствуют напряжения и деформации, при том температура во всех точках одинакова. Свяжем это состояние с начальной температурой тела $T_0$. При нагреве или охлаждении в теле возникают температурные деформации, описываемые тензором с компонентами $ \varepsilon_{kl}^0 \colon$
+    \[
+      \varepsilon_{kl}^0 = \alpha_{kl}^T \Delta T \Rightarrow \varepsilon_{kl}^0 \sim \alpha_{kl}^T,
+    \]
+    \noindent где $ \alpha_{kl}^T $ -- компоненты тензора теплового расширения.
+
+    \subsection{Тензор напряжений}
+
+    Напряжением будем называть меру внутренних сил, возникших в результате приложения внешней силы. 
+
+    Рассмотрим элементарный объем тела -- куб (рис. \refeq{fig:cube}). Если само тело находится в статическом равновесии, то силы, действующие на параллельные грани куба равны по модулю, но разные по направлению. Поэтому можно рассмотреть только те силы, которые действуют на непараллельные грани куба.
+
+    \pagebreak
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.65\textwidth]{cube.jpeg}
+      \caption{Проекции напряжений в элементарном объеме тела}
+      \label{fig:cube}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.65\textwidth]{cube_cut.jpeg}
+      \caption{Проекции напряжений на ось $x_1x_2$, проходящую через центр куба}
+      \label{fig:cube_cut}
+    \end{figure}
+
+    \pagebreak
+
+    Выделим какую-нибудь из плоскостей, вырезанную из тела (рис. \refeq{fig:cube_cut}). Равнодействующая всех сил, а также сумма всех моментов равны нулю (следует из статического равновесия). Этот факт позволяет нам сделать вывод о том, что $\sigma_{23} = \sigma_{32}$, а значит в общем случае:
+    \[
+      \sigma_{ij} = \sigma_{ji},
+    \]
+
+    \noindent то есть тензор напряжений симметричен.
+
+    \subsection{Поведение свойств среды (анизотропия, ортотропия и изотропия)}
+
+    Анизотропия -- это различие свойств среды (в нашем случае упругости и теплопроводности) в зависимости от направления. Примерами анизотропных тел являются различные кристаллы. Если вырезать две части (одну вдоль оригинального образца, а другую -- поперек), то они покажут разные растяжение и сжатие. 
+
+    Ортотропия (ортогональная анизотропия) -- это симметрия свойств тела по одному из 2-3 направлений. Например, древесина очень жесткая вдоль волокон и менее жесткая в радиальном направлении от них.
+
+    Изотропия –- это, в свою очередь, неизменность свойств среды во всех направлениях. Примерами изотропных тел являются бетон, пластик и металлы. 
+    
+    Характер поведения свойств тел можно определить только экспериментально.
+
+    \subsection{Определяющее соотношение (закон Гука)}
+
+    В реальной жизни большинство тел являются анизотропными, поэтому стандартный закон Гука уже недостаточен для описания их физических свойств. Чтобы решить эту проблему, необхоидмо ввести понятие обобщенного закона Гука, определяющего линейную зависимость между компонентами тензоров напряжений и деформаций:
+    \begin{equation}
+      \sigma_{ij} = C_{ijkl}\varepsilon_{kl}^e = C_{ijkl}( \varepsilon_{kl} - \varepsilon_{kl}^0 ), \quad i,j,k,l = 1, 2, 3.
+      \label{Hook}
+    \end{equation}
+
+    Тензор $C_{ijkl}$ упругих постоянных связывает два тензора второго ранга. Поскольку тензоры деформаций и напряжений симметричные с $6$ независимыми компонентами, то $C_{ijkl}$ будет иметь $6*6 = 36$ компонент. Но он еще и симметричен относительно перестановки пар индексов: 
+    \[
+        C_{ijkl} = C_{klij},
+    \]
+
+  \noindent поэтому имеет всего 21 независимую компоненту.
+
+  Для последующих рассуждений нам понадобится нотация Фойгта -- матричная форма записи тензора 4 ранга (симметричный по паре индексов тензор может быть записан в виде матрицы $6{\text x}6$):
+  \begin{equation}
+    \begin{split}
+        11 &\rightarrow 1, \\
+        22 &\rightarrow 2, \\
+        33 &\rightarrow 3, \\
+        23,\, 32 &\rightarrow 4, \\
+        13,\, 31 &\rightarrow 5, \\
+        12,\, 21 &\rightarrow 6. \\
+    \end{split}
+    \label{Foigt}
+  \end{equation}
+
+  Выведем некоторые закономерности для кубического симметричного кристалла (ортотропное тело). 
+  \begin{enumerate}
+    \item В силу симметрии кристалл должен иметь одну и ту же жесткость в направлении всех осей, задающих систему координат, то есть $C_{iiii} = \linebreak = \text{const}, \, i = 1, 2, 3$. В частности, для трехмерного случая можно записать:
+    \[
+      C_{1111} = C_{2222} = C_{3333} \,\, \oset[2.6mm]{(\refeq{Foigt})}{\Leftrightarrow} \,\, C_{11} = C_{22} = C_{33}.
+    \]
+
+    \item Вдоль пространственных диагоналей направлены оси симметрии третьего порядка (симметричность относительно поворота на $120^{\circ}$):
+    \[
+      \begin{split}
+      C_{1212} &= C_{1313} = C_{2323} \,\, \oset[2.6mm]{(\refeq{Foigt})}{\Leftrightarrow} \,\, C_{44} = C_{55} = C_{66}, \\[0.5em]
+      C_{1122} &= C_{1133} = C_{2233} \,\, \oset[2.6mm]{(\refeq{Foigt})}{\Leftrightarrow} \,\, C_{12} = C_{21} = C_{13} = C_{31} = C_{23} = C_{32}.
+      \end{split}
+    \]
+    
+    \item Вращательные компоненты куба не приводят к растяжению, поэтому они равны нулю.
+  \end{enumerate}
+
+  \pagebreak
+
+  Таким образом, тензору упругих постоянных можно поставить в соответствие матрицу $\hat{C}$ вида:
+  \[
+    \hat{C} = 
+    \begin{pmatrix}
+      C_{11} & C_{12} & C_{13} & 0 & 0 & 0 \\
+      C_{21} & C_{22} & C_{23} & 0 & 0 & 0 \\
+      C_{31} & C_{32} & C_{33} & 0 & 0 & 0 \\
+           0 &      0 &      0 & C_{44} & 0 & 0 \\
+           0 &      0 &      0 & 0 & C_{55} & 0 \\
+           0 &      0 &      0 & 0 & 0 & C_{66} \\
+    \end{pmatrix} 
+    =
+    \begin{pmatrix}
+      C_{11} & C_{12} & C_{12} & 0 & 0 & 0 \\
+      C_{12} & C_{11} & C_{12} & 0 & 0 & 0 \\
+      C_{12} & C_{12} & C_{11} & 0 & 0 & 0 \\
+           0 &      0 &      0 & C_{44} & 0 & 0 \\
+           0 &      0 &      0 & 0 & C_{44} & 0 \\
+           0 &      0 &      0 & 0 & 0 & C_{44} \\
+    \end{pmatrix} 
+  \] 
+
+  Для изотропных тел $C_{44} = C_{55} = C_{66} = \dfrac{1}{2}(C_{11} - C_{12})$. Воспользуемся параметрами Ламе:
+  \[ 
+    C_{11} = \lambda + 2\mu, \quad C_{12} = \lambda, \quad C_{44} = \mu,
+  \]
+
+  и подставим эти значения в матрицу $\hat{C}\colon$
+  \begin{equation}
+    \hat{C} = 
+    \begin{pmatrix}
+      \lambda + 2\mu & \lambda & \lambda & 0 & 0 & 0 \\
+      \lambda & \lambda + 2\mu & \lambda & 0 & 0 & 0 \\
+      \lambda & \lambda & \lambda + 2\mu & 0 & 0 & 0 \\
+           0 &      0 &      0 & \mu & 0 & 0 \\
+           0 &      0 &      0 & 0 & \mu & 0 \\
+           0 &      0 &      0 & 0 & 0 & \mu \\
+    \end{pmatrix} 
+    \label{Flex}
+  \end{equation}
+
+  Возвращаясь к выражению (\refeq{Hook}) и подставив туда матрицу (\refeq{Flex}), мы получаем:
+  \[
+    \begin{pmatrix}
+      \sigma_{11} \\
+      \sigma_{22} \\
+      \sigma_{33} \\
+      \sigma_{23} \\
+      \sigma_{13} \\
+      \sigma_{12} \\
+    \end{pmatrix}
+    = 
+    \begin{pmatrix}
+      \lambda + 2\mu & \lambda & \lambda & 0 & 0 & 0 \\
+      \lambda & \lambda + 2\mu & \lambda & 0 & 0 & 0 \\
+      \lambda & \lambda & \lambda + 2\mu & 0 & 0 & 0 \\
+           0 &      0 &      0 & \mu & 0 & 0 \\
+           0 &      0 &      0 & 0 & \mu & 0 \\
+           0 &      0 &      0 & 0 & 0 & \mu \\
+    \end{pmatrix} 
+    \begin{pmatrix}
+      \varepsilon_{11} \\
+      \varepsilon_{22} \\
+      \varepsilon_{33} \\
+      2\varepsilon_{23} \\
+      2\varepsilon_{13} \\
+      2\varepsilon_{12} \\
+    \end{pmatrix}
+  \]
+  \pagebreak
+
+  \noindent или в матричной форме
+
+  \[
+    \begin{split}
+      \begin{bmatrix}
+        \sigma_{11} & \sigma_{12} & \sigma_{13} \\
+        \sigma_{21} & \sigma_{22} & \sigma_{23} \\
+        \sigma_{31} & \sigma_{32} & \sigma_{33} \\
+      \end{bmatrix}
+      &= \,\,
+      2\mu \begin{bmatrix}
+        \varepsilon_{11} & \varepsilon_{12} & \varepsilon_{13} \\
+        \varepsilon_{21} & \varepsilon_{22} & \varepsilon_{23} \\
+        \varepsilon_{31} & \varepsilon_{32} & \varepsilon_{33} \\
+      \end{bmatrix}
+      + \lambda \begin{bmatrix}
+        \varepsilon_{11} & 0 & 0 \\
+        0 & \varepsilon_{22} & 0 \\ 
+        0 & 0 & \varepsilon_{33} 
+        \end{bmatrix}
+    \end{split}
+  \]
+
+  \subsection{Уравнения равновесия и граничные условия}
+  \begin{equation}
+    Ox_j\colon \dfrac{\partial \sigma_{ji}}{\partial x_i} + b_i = 0, \quad i = 1, 2, 3,
+    \label{equillibrium}
+  \end{equation}
+
+  Для трехмерного случая:
+  \[
+    \begin{split}
+      Ox\colon& \dfrac{\partial \sigma_{xx}}{\partial x} + \dfrac{\partial \sigma_{xy}}{\partial y} + \dfrac{\partial \sigma_{xz}}{\partial z} + b_x = 0, \\[0.5em]
+      Oy\colon& \dfrac{\partial \sigma_{yx}}{\partial x} + \dfrac{\partial \sigma_{yy}}{\partial y} + \dfrac{\partial \sigma_{yz}}{\partial z} + b_y = 0, \\[0.5em]
+      Oz\colon& \dfrac{\partial \sigma_{zx}}{\partial x} + \dfrac{\partial \sigma_{zy}}{\partial y} + \dfrac{\partial \sigma_{zz}}{\partial z} + b_z = 0, \\[0.5em]
+    \end{split}
+  \]
+
+  \noindent где $b_i$ -- это проекции вектора плотности объемных сил $b$ на оси $Ox_i$ простран- ственных координат.
+
+  Если тело закреплено, то любые перемещения его точек происходят за счет деформации, поэтому необходимо задать ограничения, препятствующие перемещению самой пластины; их будем называть граничными условиями. В классической задачи теории упругости такие условия разделяют на два типа: кинематические и силовые. Предполагается, что каждый их них задан на своей части поверхности. В нашем случае:
+  \[
+    \begin{split}
+      S_u\colon& u_i(\vec x, t) = \widetilde{u_i}(\vec x, t), \\
+      S_p\colon& \sigma_{ij}(\vec x) n_j(\vec x)  = \widetilde{p_i}(\vec x),  \\
+    \end{split}
+  \]
+
+  \noindent где $S = S_u \cup S_p$ -- поверхность рассматриваемого тела; $S_u$ -- часть поверхности, на которой заданы кинематические условия, $S_p$ -- силовые.
+  
+  \subsection{Моделирование разрушения. Модель размазанных трещин}
+
+  В основе модели размазанных трещин лежит изменение свойств материала, она применима только для тех тел, в которых образование микротрещин, пластическая деформация, разрывы деформаций и напряжений пренебрежимо малы. Например, керамика и бетон обладают этими свойствами.
+  
+  При нагрузке хрупкого материала, процесс разрушения может быть описан, как разгрузка по всему объему в сочетании с дополнительным растяжением. На рис. \refeq{fig:ceramic} видно, что пока напряжение меньше предела прочности $\sigma < \sigma_f$  и деформации меньше соответствующего значения $\varepsilon < \varepsilon_f$, материал ведет себя, как линейно-упругий, а затем происходит разгрузка по нелинейному закону.
+
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{ceramic.jpeg}
+    \caption{Кривая нормализованного растягивающего отклика для керамических материалов}
+    \label{fig:ceramic}
+  \end{figure}
+
+  \pagebreak
+
+  При достижении предельного значения прочности $\sigma_f$ происходит инициализация трещины. Она формируется лишь после достижения значений деформаций, превышающих $\varepsilon_f$ в $5-10$ раз. Кривую, имеющую данный характер поведения, можно аппроксимировать в следующем виде:
+  \[
+    \dfrac{\sigma}{\sigma_f} = A + B e^{-C\tfrac{\varepsilon}{\varepsilon_f}},
+  \]
+
+  \noindent где $A \approx -0.024, B \approx 1.69, C \approx 0.5$.
+  
+  Важно отметить, что модель размазанных трещин чувствительна к шагу сетки, что является ее главным недостатком.
+
+  \section{Одномерный случай}
+
+  В качестве численного метода применим метод дополнительных деформаций. Как было отмечено раннее, до достижения предела прочности тело ведет себя, как линейно-упругое, а затем происходит разгрузка по нелинейному закону. Тогда зависимость напряжений от деформации определяется условиями:
+  \begin{equation}
+    \sigma(\varepsilon) = 
+    \begin{cases}
+      E\varepsilon^e, & E\varepsilon^e < \sigma_f^v(\varepsilon); \\
+      \sigma_f \Bigl( A + B e^{-C \tfrac{\varepsilon^e}{\varepsilon_f}} \Bigr), & E\varepsilon^e \geq \sigma_f^v(\varepsilon);
+    \end{cases}
+    \label{sigma}
+  \end{equation}
+
+  \noindent где $\varepsilon^e$ -- упругая деформация, $\sigma_f^v(\varepsilon)$ -- переменный предел прочности, который в недеформированном состоянии равен пределу прочности при растяжении $\sigma_f$, $E$ -- модуль Юнга.
+
+  Значение упругой деформации определяется выражением:
+  \[
+    \varepsilon^e = \varepsilon - \varepsilon^T - \varepsilon^{crk},
+  \]
+  \noindent где 
+  $\varepsilon$ -- полная деформация, является результатом решения уравнений движения, $\varepsilon^T$ -- температурная деформация, $\varepsilon^{crk}$ -- деформация за счет трещин, которая вычисляется на предыдущем временном шаге и при допредельных значений деформаций равна $0$. В послепиковой области, где тело ведет себя по нелинейному закону, $\varepsilon^{crk} > 0$. При разгрузке значение деформации за счет трещин остается постоянным, а материал ведет себя, как линейно-упругий с пределом прочности $\sigma_f^v(\varepsilon)$ и модулем Юнга $E\colon$
+  \[
+    \varepsilon^{crk} = \varepsilon - \varepsilon^T - \dfrac{\sigma(\varepsilon)}{E}.
+  \] 
+
+  Рассмотрим квазистационарную задачу: возьмем стержень длиной $l$, закрепленный с обоих концов. Будем решать уравнение равновесия для всех временных слоев, чтобы определять напряжение и значения всех видов деформаций на них. Зададим свойства материала: предел прочности $\sigma_f, \varepsilon_f$, модуль Юнга $E$, коэффициент теплового расширения $\alpha$. Для диоксида урана:
+  \[
+    \begin{split}
+      \sigma_f &= 1.1 \cdot 10^8 \text{Па}, \\
+      \varepsilon_f &= 0.000628571, \\
+      \alpha &= 10^{-5} \text{K}^{-1}.
+    \end{split}
+  \]
+
+  Будем прикладывать знакопеременную нагрузку по закону:
+  \[
+    T(x, t) = \widetilde{T} + F(x) \tau(t),
+  \]
+  \noindent где $\widetilde{T}$ -- усредненная по времени температура, $F(x)$ -- функция, описывающее пространтсвенное распределение температуры, а $\tau(t)$ -- временное.
+
+  Опишем математическую модель для одномерного стержня:
+  \begin{equation}
+    \begin{cases}
+      T(x, t) = \widetilde{T} + F(x) \tau(t), & t \geq 0, \quad 0 \leq x \leq l, \\[0.7em]
+      \dfrac{\partial \sigma}{\partial x} = 0, & 0 \leq x \leq l, \\[0.7em]
+      \sigma = \sigma(\varepsilon - \varepsilon^0), \\[0.7em]
+      \varepsilon = \dfrac{\partial u}{\partial x}, \\[0.7em]
+      \varepsilon^T = \alpha(T - T_0), \\[0.7em]
+      u(0, t) = u(l, t) = 0.
+    \end{cases}
+    \label{model}
+  \end{equation}
+
+  Выберем функцию $F(x)$ симметричной относительно середины стержня. Пусть $F(x) = \sin(\tfrac{\pi x}{l})$. Будем решать задачу методом конечных разностей.
+
+  \section{Результаты вычислений}
+
+  Пока значения напряжения меньше предела прочности $\sigma_f$ имеет место линейный случай системы (\refeq{sigma}), для которого можно найти аналитическое решение:
+  \begin{equation}
+    \begin{split}
+      &\sigma(\varepsilon) = E\varepsilon^e = E(\varepsilon - \varepsilon^T) = E \Bigl(\dfrac{\partial u}{\partial x} - \alpha(T(x,t) - T_0 ) \Bigr) \\[0.7em]
+      &\dfrac{\partial \sigma}{\partial x} = E(u_{xx} - \alpha \, T_x (x, t)) \Rightarrow u_{xx} - \alpha \, T_x (x, t) = 0
+    \end{split}
+    \label{linearSigma}
+  \end{equation}
+
+  Когда $\sigma \geq \sigma_f$, материал разгружается по нелинейному знакому, будем использовать метод Ньютона для линеаризации нелинейного уравнения.
+
+  Физические характеристики диоксида урана: $\alpha = 10^{-5} K^{-1}$, $\widetilde{T} = T_0 = 300 K$, $E = 1.75 \cdot 10^{11}$ Па, $\sigma_f = 1.1 \cdot 10^8$ Па, $\varepsilon_f = 0.000628571$. Длина стержня $l = 1$ м, измерения длятся $T_f = 22$ сек. Пусть $a = 50$.
+
+  Рассмотрим поведение одномерного стержня на четырех периодах нагружения. Поведение стержня будем рассматривать в точке $x = h$, где $h$ -- шаг сетки.
+
+  \begin{enumerate}
+    \item $T(x, t) = \widetilde{T} + F(x) t \sin t, \quad F(x) = a \sin \Bigl( \dfrac{\pi x}{l} \Bigr)$
+    
+    Аналитическое решение (\refeq{linearSigma}):
+    \[
+      u(x, t) = \dfrac{a l t \alpha \sin(t) - 2 a t x \alpha \sin(t) - a l t \alpha \cos (\tfrac{\pi x}{l}) \sin t}{\pi}.
+    \]
+
+    \centerline{$t = 1$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.05   & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.05   & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.05   & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.05   & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.05   & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \pagebreak
+
+    \centerline{$t = 5$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.05   & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.05   & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.05   & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.05   & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.05   & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{1cm}
+
+    \centerline{$t = 10$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.05   & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.05   & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.05   & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.05   & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.05   & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{1cm}
+
+    \centerline{$t = 20$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.05   & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.05   & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.05   & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.05   & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.05   & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{0.7em}
+
+    Из графика видно, что сначала происходит равномерное нагружение (до достижения переменного предела прочности $\sigma_f^v$), и материал ведет себя, как линейно-упругий, а затем происходит разрузка по нелинейному убывающему закону. Затем происходит повторный этап нагружения. 
+
+    График зависимости деформаций имеет ступенчатый вид, что подтверждает цилкичность процесса <<нагрузка-разрузка>>, а также способность модели накапливать информацию о разрушении стержня в предыдущие моменты времени. 
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T1/h_1_tau_0.05/epsilon(t).pdf}
+      \caption{Зависимость полной деформации от времени}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T1/h_1_tau_0.05/epsilon_crk(t).pdf}
+      \caption{Зависимость деформаций за счет трещин от времени}
+    \end{figure}
+
+    \pagebreak
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T1/h_1_tau_0.05/sigma(t).pdf}
+      \caption{Зависимость напряжений от времени}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T1/h_1_tau_0.05/sigma(epsilon).pdf}
+      \caption{Зависимость напряжений от деформаций}
+    \end{figure}
+
+    \pagebreak
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T1/h_1_tau_0.05/norm_sigma(epsilon).pdf}
+      \caption{Зависимость напряжений от деформаций по отношению к пределу прочности}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T1/h_1_tau_0.05/T(t).pdf}
+      \caption{Зависимость температуры от времени}
+    \end{figure}
+    
+    \pagebreak
+
+    \item $T(x, t) = \widetilde{T} + F(x) \cos (\pi t^2) (t + 1), \quad F(x) = a \sin \Bigl( \dfrac{\pi x}{l} \Bigr)$
+    
+    Аналитическое решение (\refeq{linearSigma}):
+    \[
+      u(x, t) = -\dfrac{\alpha a (t+1) \cos (\pi t^2) (2x - l + l \cos (\tfrac{\pi x}{l}))}{\pi}.
+    \]
+
+    \centerline{$t = 1$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.005  & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.005  & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.005  & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.005  & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.005  & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{1cm}
+
+    \centerline{$t = 5$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.005  & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.005  & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.005  & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.005  & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.005  & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{1cm}
+
+    \centerline{$t = 10$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.005  & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.005  & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.005  & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.005  & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.005  & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \pagebreak
+
+    \centerline{$t = 20$}
+    \vspace{0.5em}
+    \begin{center}
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $i$ & $h$     & $\tau$ & $|| error ||_C$ & $|| error_i ||_C \, / \, || error_{i+1} ||_C$ \\
+        \hline
+        1   & 0.1     & 0.005  & 3 & 3 \\
+        \hline 
+        2   & 0.05    & 0.005  & 3 & 3 \\
+        \hline
+        3   & 0.025   & 0.005  & 3 & 3 \\
+        \hline
+        4   & 0.0025  & 0.005  & 3 & 3 \\
+        \hline 
+        5   & 0.00125 & 0.005  & 3 & 3 \\
+        \hline
+      \end{tabular}
+    \end{center}
+
+    \vspace{0.5em}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T2/h_1_tau_0.005/epsilon(t).pdf}
+      \caption{Зависимость полной деформации от времени}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T2/h_1_tau_0.005/epsilon_crk(t).pdf}
+      \caption{Зависимость деформаций за счет трещин от времени}
+    \end{figure}
+
+    \pagebreak
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T2/h_1_tau_0.005/sigma(t).pdf}
+      \caption{Зависимость напряжений от времени}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.725\textwidth]{T2/h_1_tau_0.005/sigma(epsilon).pdf}
+      \caption{Зависимость напряжений от деформаций}
+    \end{figure}
+
+    \pagebreak
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T2/h_1_tau_0.005/norm_sigma(epsilon).pdf}
+      \caption{Зависимость напряжений от деформаций по отношению к пределу прочности}
+    \end{figure}
+
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.68\textwidth]{T2/h_1_tau_0.005/T(t).pdf}
+      \caption{Зависимость температуры от времени}
+    \end{figure}
+    
+    \pagebreak
+  \end{enumerate}
+
+  \includepdf[pages=1,offset=0 -40,pagecommand={\subsection{Программная реализация}}, fitpaper=true]{code.pdf}
+  \includepdf[pages=2-, offset=0 -20, pagecommand={}, fitpaper=true]{code.pdf}
+
+    \section-{Заключение}
+
+    Была исследована математическая модель разрушения стержня, состоящего из диоксида урана. Был проведен графический анализ распространения трещин, основанный на графиках напряжений и перемещений.
+
+    Решение вышеуказанной задачи было реализовано в системе компьютерной алгебры Wolfram Mathematica.
+
+    \newpage
+
+    \begin{thebibliography}{9}
+  
+      \bibitem{Karelia} Тензоры напряжений и деформаций. URL: \url{http://solidstate.karelia.ru/p/tutorial/ftt/Part4/part4_1.htm}
+
+      \bibitem{Deform} Тензор деформаций. SolverBook - онлайн сервисы для учебы. URL: \url{http://ru.solverbook.com/spravochnik/fizika/tenzor-deformacii/}
+
+      \bibitem{Flex} Теория упругости. Wikipedia –- свободная энциклопедия. URL: \url{https://en.wikipedia.org/wiki/Linear_elasticity}
+
+      \bibitem{Galanin} Галанин М.П. Методы численного анализа математических моделей/М.П. Галанин, Е.Б. Савенков.–М. : Изд-во МГТУ им. Н.Э. Баумана, 2010.–591, [1] с.: ил. (Математическое моделирование в технике и технологии)
+
+      \bibitem{GalaninAndOthers} Математическое моделирование разрушения хрупкого материа- ла под действием тепловых нагрузок / М.П. Галанин [и др.] // Препринты ИПМ им. М.В. Келдыша. 2013.No 100. 36 с. URL: \url{http://library.keldysh.ru/preprint.asp?id=2013-100}
+
+    \end{thebibliography}
+
+    \end{document}
