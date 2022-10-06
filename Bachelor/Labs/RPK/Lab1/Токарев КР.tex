@@ -1,0 +1,85 @@
+\documentclass[12pt,a4paper]{article} 
+
+\usepackage{../../fn2kursstyle}
+\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc} 
+\usepackage[utf8]{inputenc} 
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{multirow,array}
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+
+\counterwithout{equation}{section}
+\counterwithout{figure}{section}
+\graphicspath{{pic/}}
+\frenchspacing 
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\newcommand{\picref}[1]{рис. \ref{#1}}
+\newcommand{\tabref}[1]{таблица \ref{#1}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\dhalf}{\dfrac{1}{2}}
+\newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}
+
+\title{Лабораторная работа №1 по дисциплине "Разработка программных комплексов" на тему "Методы конечных элементов"}
+\group{ФН2-72Б}
+\author{Токарев А.\,И.}
+\supervisor{Азметов Х.\,Х.}
+\date{2022}
+
+\begin{document}
+    \maketitle
+    \tableofcontents
+    \pagebreak
+
+    \section{Задача}
+
+    Создать программу решения дифференциального уравнения проекционными методами. Задано урванение на области $[0, 1]\colon$
+    \[
+        \dfrac{d^2 u}{dx^2} + u + x = 0, \quad u(0) = u(1) = 0.
+    \]  
+
+    Необходимо реализовать методы решения:
+    \begin{enumerate}
+        \item Метод коллокаций в точках
+        \item Метод коллокаций в подобластях
+        \item Метод Бубнова-Галеркина
+        \item Метод Галеркина
+        \item Метод наименьших квадратов
+        \item Метод Ритца
+    \end{enumerate}
+
+    Для каждого из методов нужно получить решение с порядком аппроксимации от $1$ до $3$.
+
+    \pagebreak
+
+    \section{Метод коллокации в точке}
+
+    \pagebreak
+
+    \section{Метод коллокаций в подобластях}
+
+    \pagebreak
+
+    \section{ Метод Бубнова-Галеркина}
+
+    \pagebreak
+
+    \section{ Метод Галеркина}
+
+    \pagebreak
+
+    \section{Метод наименьших квадратов}
+
+    \pagebreak
+
+    \section{Метод Ритца}
+
+\end{document}
