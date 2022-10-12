@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3628F72CB7002B1E33 /* norms.cpp */; };
+		2140BF3E28F73140002B1E33 /* lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* lu.cpp */; };
+		216C90A928F1835F00F3A88C /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216C90A728F1835F00F3A88C /* algorithm.cpp */; };
 		2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2196E7D528F0BAB70018B18F /* helpers.cpp */; };
 		21BBD51C28F097610043676E /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BBD51B28F097610043676E /* matrix.cpp */; };
 		21FEA12C28F075080070C7F7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21FEA12B28F075080070C7F7 /* main.cpp */; };
@@ -25,6 +28,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2140BF3628F72CB7002B1E33 /* norms.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = norms.cpp; sourceTree = "<group>"; };
+		2140BF3728F72CB7002B1E33 /* norms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = norms.hpp; sourceTree = "<group>"; };
+		2140BF3C28F73140002B1E33 /* lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lu.cpp; sourceTree = "<group>"; };
+		2140BF3D28F73140002B1E33 /* lu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lu.hpp; sourceTree = "<group>"; };
+		216C90A728F1835F00F3A88C /* algorithm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
+		216C90A828F1835F00F3A88C /* algorithm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = algorithm.hpp; sourceTree = "<group>"; };
 		2196E7D528F0BAB70018B18F /* helpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = helpers.cpp; sourceTree = "<group>"; };
 		2196E7D628F0BAB70018B18F /* helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helpers.hpp; sourceTree = "<group>"; };
 		21BBD51628F0915C0043676E /* matrix.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = matrix.hpp; sourceTree = "<group>"; };
@@ -44,11 +53,56 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		21BBD51528F091440043676E /* matrix */ = {
+		2140BF3528F72CA5002B1E33 /* norms */ = {
+			isa = PBXGroup;
+			children = (
+				2140BF3728F72CB7002B1E33 /* norms.hpp */,
+				2140BF3628F72CB7002B1E33 /* norms.cpp */,
+			);
+			path = norms;
+			sourceTree = "<group>";
+		};
+		2140BF3A28F7311D002B1E33 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				2140BF3B28F73125002B1E33 /* LU */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		2140BF3B28F73125002B1E33 /* LU */ = {
+			isa = PBXGroup;
+			children = (
+				2140BF3D28F73140002B1E33 /* lu.hpp */,
+				2140BF3C28F73140002B1E33 /* lu.cpp */,
+			);
+			path = LU;
+			sourceTree = "<group>";
+		};
+		216C90A528F1833300F3A88C /* core */ = {
 			isa = PBXGroup;
 			children = (
 				21BBD51628F0915C0043676E /* matrix.hpp */,
 				21BBD51B28F097610043676E /* matrix.cpp */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		216C90A628F1834C00F3A88C /* algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				216C90A828F1835F00F3A88C /* algorithm.hpp */,
+				216C90A728F1835F00F3A88C /* algorithm.cpp */,
+			);
+			path = algorithm;
+			sourceTree = "<group>";
+		};
+		21BBD51528F091440043676E /* matrix */ = {
+			isa = PBXGroup;
+			children = (
+				216C90A528F1833300F3A88C /* core */,
+				216C90A628F1834C00F3A88C /* algorithm */,
+				2140BF3528F72CA5002B1E33 /* norms */,
 			);
 			path = matrix;
 			sourceTree = "<group>";
@@ -83,6 +137,7 @@
 			children = (
 				21BBD51D28F0ADEA0043676E /* helpers */,
 				21BBD51528F091440043676E /* matrix */,
+				2140BF3A28F7311D002B1E33 /* tests */,
 				21FEA12B28F075080070C7F7 /* main.cpp */,
 			);
 			path = Parallels;
@@ -146,7 +201,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				21BBD51C28F097610043676E /* matrix.cpp in Sources */,
+				216C90A928F1835F00F3A88C /* algorithm.cpp in Sources */,
 				2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */,
+				2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */,
+				2140BF3E28F73140002B1E33 /* lu.cpp in Sources */,
 				21FEA12C28F075080070C7F7 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

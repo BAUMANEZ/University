@@ -14,9 +14,11 @@
 #include <iomanip>
 #include <vector>
 #include <algorithm>
-#include "../helpers/helpers.hpp"
+#include <string>
+#include <sstream>
+#include "../../helpers/helpers.hpp"
 
-struct matrix {
+struct matrix final {
 private:
     std::vector<double> values;
     size_t n;
@@ -26,29 +28,38 @@ private:
 public:
     size_t rows() const;
     size_t cols() const;
-    
-//MARK: - Setters
-    void set_size(size_t n);
-    void set_size(size_t n, size_t m);
 
 //MARK: - Init
 public:
-    matrix(size_t n);
     matrix(size_t n, double initial);
-    matrix(size_t n, size_t m);
+    matrix(size_t n, double l, double r);
     matrix(size_t n, size_t m, double initial);
+    matrix(size_t n, size_t m, double l, double r);
     matrix(std::vector<std::vector<double>> nested);
+    matrix(const matrix& copy);
+    matrix(matrix&& rvalue) noexcept;
+    
+//MARK: - Setters
+    void resize(size_t n, double fill);
+    void resize(size_t n, size_t m, double fill);
     
 //MARK: - Contents
 public:
     double elem(size_t i, size_t j) const;
     double& mutable_elem(size_t i, size_t j);
+    std::vector<double> row_at(size_t i) const;
+    std::vector<double> col_at(size_t i) const;
+    
+//MARK: Operators
+    matrix operator+(const matrix& rhs);
+    matrix operator-(const matrix& rhs);
+    matrix operator*(const matrix& rhs);
     
 //MARK: - Service
 public:
     friend std::ostream& operator<<(std::ostream& out, const matrix& ref);
-    static matrix identity_matrix(size_t n);
-    static matrix identity_matrix(size_t n, size_t m);
+    static matrix make_identity(size_t n);
+    static matrix make_identity(size_t n, size_t m);
 };
 
 #endif /* matrix_h */
