@@ -5,19 +5,7 @@
 //  Created by Арсений Токарев on 07.10.2022.
 //
 
-#ifndef matrix_cpp
-#define matrix_cpp
-
 #include "matrix.hpp"
-#include <math.h>
-
-//MARK: - Getters
-size_t matrix::rows() const {
-    return this->n;
-}
-size_t matrix::cols() const {
-    return this->m;
-}
 
 //MARK: - Init
 matrix::matrix(size_t n, double initial): matrix(n, n, initial) {}
@@ -61,8 +49,6 @@ matrix::matrix(matrix&& rvalue) noexcept {
     this->n = rvalue.n;
     this->m = rvalue.m;
     this->values = std::move(rvalue.values);
-    rvalue.n = -INFINITY;
-    rvalue.m = -INFINITY;
 }
 
 //MARK: - Setters
@@ -110,6 +96,15 @@ std::vector<double> matrix::col_at(size_t j) const {
         result.push_back(*(it+j));
     return result;
 }
+matrix matrix::submatrix(size_t n, size_t m, size_t i, size_t j) const {
+    assert_message(i+n<=this->n, "Submatrix has more rows than the original");
+    assert_message(j+m<=this->m, "Submatrix has more cols than the original");
+    matrix result(n, m, 0.);
+    for (size_t k = i; k < i+n; ++k)
+        for (size_t l = j; l < j+m; ++l)
+            result.mutable_elem(k-i, l-j) = elem(k, l);
+    return result;
+}
 
 //MARK: Operators
 matrix matrix::operator+(const matrix& rhs) {
@@ -132,15 +127,31 @@ matrix matrix::operator*(const matrix& rhs) {
     assert_message(m == rhs.n, "Cols(I) is not equal to Rows(II)");
     matrix result(n, rhs.m, 0.);
     for (size_t i = 0; i < n; ++i) {
-        const std::vector<double> i_row = row_at(i);
+//        const std::vector<double> i_row = row_at(i);
         for (size_t k = 0; k < m; ++k) {
-            const std::vector<double> i_col = rhs.row_at(k);
+//            const std::vector<double> i_col = rhs.row_at(k);
             for (size_t j = 0; j < rhs.m; ++j)
-                result.mutable_elem(i, j) += i_row[k]*i_col[j];
+                result.mutable_elem(i, j) += elem(i, k)*rhs.elem(k, j);//i_row[k]*i_col[j];
         }
     }
     return result;
 }
+void matrix::operator=(const matrix& rhs) {
+    n = rhs.n;
+    m = rhs.m;
+    values = rhs.values;
+}
+void matrix::operator=(const matrix&& rhs) {
+    n = rhs.n;
+    m = rhs.m;
+    values = std::move(rhs.values);
+}
+
+//MARK: - Linear Algebra Modifications
+void invert() {
+    
+}
+//matrix inverted();
 
 
 //MARK: - Service
@@ -195,4 +206,4 @@ matrix matrix::make_identity(size_t n, size_t m) {
     return result;
 }
 
-#endif
+

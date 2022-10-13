@@ -8,14 +8,13 @@
 #ifndef matrix_hpp
 #define matrix_hpp
 
-#include <stdarg.h>
-#include <stdio.h>
 #include <iostream>
 #include <iomanip>
 #include <vector>
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <math.h>
 #include "../../helpers/helpers.hpp"
 
 struct matrix final {
@@ -26,8 +25,8 @@ private:
     
 //MARK: - Getters
 public:
-    size_t rows() const;
-    size_t cols() const;
+    inline size_t rows() const { return n; }
+    inline size_t cols() const { return m; }
 
 //MARK: - Init
 public:
@@ -49,11 +48,18 @@ public:
     double& mutable_elem(size_t i, size_t j);
     std::vector<double> row_at(size_t i) const;
     std::vector<double> col_at(size_t i) const;
+    matrix submatrix(size_t n, size_t m, size_t i = 0, size_t j = 0) const;
     
 //MARK: Operators
     matrix operator+(const matrix& rhs);
     matrix operator-(const matrix& rhs);
     matrix operator*(const matrix& rhs);
+    void   operator=(const matrix& rhs);
+    void   operator=(const matrix&& rhs);
+    
+//MARK: - Linear Algebra Modifications
+    void invert();
+    matrix inverted() const;
     
 //MARK: - Service
 public:

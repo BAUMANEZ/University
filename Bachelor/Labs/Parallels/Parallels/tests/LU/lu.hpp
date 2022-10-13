@@ -9,6 +9,7 @@
 #define lu_hpp
 
 #include <iostream>
+#include <time.h>
 #include "../../matrix/core/matrix.hpp"
 #include "../../matrix/algorithm/algorithm.hpp"
 #include "../../matrix/norms/norms.hpp"
@@ -16,7 +17,7 @@
 struct lu_test {
     enum method { block, non_block };
     
-    static void run(method method, bool parallel);
+    static void run(method method);
 };
 
 #endif /* lu_hpp */

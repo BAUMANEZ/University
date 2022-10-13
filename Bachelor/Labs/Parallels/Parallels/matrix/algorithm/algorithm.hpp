@@ -13,7 +13,7 @@
 
  struct algorithm final {
      static void lu_decomposition(matrix& A);
-     static void blu_decomposition(matrix& A);
+     static void blu_decomposition(matrix& A, const size_t block);
      static matrix lu_multiplication(const matrix& A);
 };
 

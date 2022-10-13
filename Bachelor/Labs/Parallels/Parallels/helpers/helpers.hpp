@@ -13,8 +13,6 @@
 
 #define assert_message(exp, msg) assert(((void)msg, exp))
 
-
-
 inline int number_of_digits(double num, int precision = 16) {
     int digits = 0;
     double original = num;

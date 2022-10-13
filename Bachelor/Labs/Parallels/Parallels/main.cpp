@@ -5,12 +5,22 @@
 //  Created by Арсений Токарев on 07.10.2022.
 //
 
-#include <iostream>
 //#include "omp.h"
-#include "./matrix/core/matrix.hpp"
-#include "./matrix/algorithm/algorithm.hpp"
-#include "./matrix/norms/norms.hpp"
-#include "./tests/LU/lu.hpp"
+#include <iostream>
+
+//MARK: - when run from xcode
+#if DEBUG || RELEASE
+    #include "./matrix/core/matrix.hpp"
+    #include "./matrix/algorithm/algorithm.hpp"
+    #include "./matrix/norms/norms.hpp"
+    #include "./tests/LU/lu.hpp"
+//MARK: - when run from terminal/sublime/vscode
+#else
+    #include "./matrix/core/matrix.cpp"
+    #include "./matrix/algorithm/algorithm.cpp"
+    #include "./matrix/norms/norms.cpp"
+    #include "./tests/LU/lu.cpp"
+#endif
 
 std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
     const int precision = 8;
@@ -28,6 +38,11 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
 }
 
 int main(int argc, const char * argv[]) {
-    lu_test::run(lu_test::non_block, false);
+//    matrix a({
+//        {1., 2., 3.},
+//        {4., 5., 6.},
+//        {7., 8., 9.}
+//    });
+    lu_test::run(lu_test::block);
     return 0;
 }
