@@ -44,7 +44,6 @@ extension Algorithm {
             ]
         }
         
-        
         public init(start: Double, end: Double, step: Double) {
             self.start = start
             self.end = end

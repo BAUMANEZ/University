@@ -14,7 +14,7 @@
 #include "../../matrix/algorithm/algorithm.hpp"
 #include "../../matrix/norms/norms.hpp"
 
-struct lu_test {
+struct test_lu final {
     enum method { block, non_block };
     
     static void run(method method, bool paralleled);

@@ -5,10 +5,10 @@
 //  Created by Арсений Токарев on 12.10.2022.
 //
 
-#include "lu.hpp"
+#include "test_lu.hpp"
 
-void lu_test::run(method method, bool paralleled) {
-    matrix test(1024, 1024, -30., 30.);
+void test_lu::run(method method, bool paralleled) {
+    matrix test(512, 512, -30., 30.);
     matrix lu_test(test);
     std::cout << "Randomly generated matrix: ";
     std::cout << test;

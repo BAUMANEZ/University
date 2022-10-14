@@ -13,7 +13,7 @@ matrix::matrix(size_t n, double l, double r): matrix(n, n, l, r) {}
 matrix::matrix(size_t n, size_t m, double initial) {
     this->n = n;
     this->m = m;
-    (this->values).resize(n*m, initial);
+    this->values = std::vector<double>(n*m, initial);
 }
 matrix::matrix(size_t n, size_t m, double l, double r) {
     this->n = n;
@@ -106,7 +106,7 @@ matrix matrix::submatrix(size_t n, size_t m, size_t i, size_t j) const {
     return result;
 }
 
-//MARK: Operators
+//MARK: - Operators
 matrix matrix::operator+(const matrix& rhs) {
     assert_message(n == rhs.n && m == rhs.m, "Dimensions are not equal");
     matrix result(*this);
@@ -148,11 +148,6 @@ void matrix::operator=(const matrix&& rhs) {
 }
 
 //MARK: - Linear Algebra Modifications
-void invert() {
-    
-}
-//matrix inverted();
-
 
 //MARK: - Service
 std::ostream& operator<<(std::ostream& out, const matrix& ref) {

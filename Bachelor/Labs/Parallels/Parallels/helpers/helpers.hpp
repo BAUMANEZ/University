@@ -9,9 +9,12 @@
 #define helpers_hpp
 
 #include <vector>
+#include <functional>
 #include "math.h"
 
 #define assert_message(exp, msg) assert(((void)msg, exp))
+
+typedef std::function<double(double, double)> func2d;
 
 inline int number_of_digits(double num, int precision = 16) {
     int digits = 0;

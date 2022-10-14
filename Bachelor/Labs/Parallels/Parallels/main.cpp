@@ -12,14 +12,16 @@
     #include "./matrix/core/matrix.hpp"
     #include "./matrix/algorithm/algorithm.hpp"
     #include "./matrix/norms/norms.hpp"
-    #include "./tests/LU/lu.hpp"
+    #include "./tests/lu/test_lu.hpp"
+    #include "./tests/helmholtz/test_helmholtz.hpp"
 //MARK: - when run from terminal/sublime/vscode
 #else
     #include "./matrix/core/matrix.cpp"
     #include "./matrix/algorithm/algorithm_lu.cpp"
     #include "./matrix/algorithm/algorithm_helmholtz.cpp"
     #include "./matrix/norms/norms.cpp"
-    #include "./tests/LU/lu.cpp"
+    #include "./tests/lu/test_lu.cpp"
+    #include "./tests/helmholtz/test_helmholtz.cpp"
 #endif
 
 std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
@@ -38,6 +40,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
 }
 
 int main(int argc, const char * argv[]) {
-    lu_test::run(lu_test::block, false);
+//    test_lu::run(test_lu::block, false);
+    test_helmholtz::run(false);
     return 0;
 }

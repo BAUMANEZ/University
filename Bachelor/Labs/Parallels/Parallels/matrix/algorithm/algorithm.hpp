@@ -9,8 +9,13 @@
 #define algorithm_hpp
 
 #include <iostream>
-#include "omp.h"
+#include <array>
+#include <functional>
+//#include "omp.h"
 #include "../core/matrix.hpp"
+#include "../norms/norms.hpp"
+#include "../../grid/1d/grid1d.hpp"
+#include "../../helpers/helpers.hpp"
 
  struct algorithm final {
 //MARK: - LU
@@ -22,7 +27,7 @@
      
 //MARK: - Helmholtz
  public:
-     static void helmholtz();
+     static void helmholtz(double k, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
 };
 
 #endif /* algorithm_hpp */

@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3628F72CB7002B1E33 /* norms.cpp */; };
-		2140BF3E28F73140002B1E33 /* lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* lu.cpp */; };
+		2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* test_lu.cpp */; };
+		2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2142775028F95BB2009EBA0D /* grid1d.cpp */; };
+		2142775728F9624B009EBA0D /* test_helmholtz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2142775528F9624B009EBA0D /* test_helmholtz.cpp */; };
 		216C90A928F1835F00F3A88C /* algorithm_lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216C90A728F1835F00F3A88C /* algorithm_lu.cpp */; };
 		2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2196E7D528F0BAB70018B18F /* helpers.cpp */; };
 		21BBD51C28F097610043676E /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BBD51B28F097610043676E /* matrix.cpp */; };
@@ -31,8 +33,12 @@
 /* Begin PBXFileReference section */
 		2140BF3628F72CB7002B1E33 /* norms.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = norms.cpp; sourceTree = "<group>"; };
 		2140BF3728F72CB7002B1E33 /* norms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = norms.hpp; sourceTree = "<group>"; };
-		2140BF3C28F73140002B1E33 /* lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lu.cpp; sourceTree = "<group>"; };
-		2140BF3D28F73140002B1E33 /* lu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lu.hpp; sourceTree = "<group>"; };
+		2140BF3C28F73140002B1E33 /* test_lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_lu.cpp; sourceTree = "<group>"; };
+		2140BF3D28F73140002B1E33 /* test_lu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = test_lu.hpp; sourceTree = "<group>"; };
+		2142775028F95BB2009EBA0D /* grid1d.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = grid1d.cpp; sourceTree = "<group>"; };
+		2142775128F95BB2009EBA0D /* grid1d.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = grid1d.hpp; sourceTree = "<group>"; };
+		2142775528F9624B009EBA0D /* test_helmholtz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_helmholtz.cpp; sourceTree = "<group>"; };
+		2142775628F9624B009EBA0D /* test_helmholtz.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = test_helmholtz.hpp; sourceTree = "<group>"; };
 		216C90A728F1835F00F3A88C /* algorithm_lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm_lu.cpp; sourceTree = "<group>"; };
 		216C90A828F1835F00F3A88C /* algorithm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = algorithm.hpp; sourceTree = "<group>"; };
 		2196E7D528F0BAB70018B18F /* helpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = helpers.cpp; sourceTree = "<group>"; };
@@ -67,18 +73,45 @@
 		2140BF3A28F7311D002B1E33 /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				2140BF3B28F73125002B1E33 /* LU */,
+				2140BF3B28F73125002B1E33 /* lu */,
+				2142775428F9622C009EBA0D /* helmholtz */,
 			);
 			path = tests;
 			sourceTree = "<group>";
 		};
-		2140BF3B28F73125002B1E33 /* LU */ = {
+		2140BF3B28F73125002B1E33 /* lu */ = {
 			isa = PBXGroup;
 			children = (
-				2140BF3D28F73140002B1E33 /* lu.hpp */,
-				2140BF3C28F73140002B1E33 /* lu.cpp */,
+				2140BF3D28F73140002B1E33 /* test_lu.hpp */,
+				2140BF3C28F73140002B1E33 /* test_lu.cpp */,
 			);
-			path = LU;
+			path = lu;
+			sourceTree = "<group>";
+		};
+		2142774E28F95B89009EBA0D /* grid */ = {
+			isa = PBXGroup;
+			children = (
+				2142774F28F95B9F009EBA0D /* 1d */,
+			);
+			path = grid;
+			sourceTree = "<group>";
+		};
+		2142774F28F95B9F009EBA0D /* 1d */ = {
+			isa = PBXGroup;
+			children = (
+				2142775128F95BB2009EBA0D /* grid1d.hpp */,
+				2142775028F95BB2009EBA0D /* grid1d.cpp */,
+			);
+			path = 1d;
+			sourceTree = "<group>";
+		};
+		2142775428F9622C009EBA0D /* helmholtz */ = {
+			isa = PBXGroup;
+			children = (
+				2142775628F9624B009EBA0D /* test_helmholtz.hpp */,
+				2142775528F9624B009EBA0D /* test_helmholtz.cpp */,
+			);
+			path = helmholtz;
 			sourceTree = "<group>";
 		};
 		216C90A528F1833300F3A88C /* core */ = {
@@ -140,6 +173,7 @@
 			children = (
 				21BBD51D28F0ADEA0043676E /* helpers */,
 				21BBD51528F091440043676E /* matrix */,
+				2142774E28F95B89009EBA0D /* grid */,
 				2140BF3A28F7311D002B1E33 /* tests */,
 				21FEA12B28F075080070C7F7 /* main.cpp */,
 			);
@@ -208,8 +242,10 @@
 				2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */,
 				21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz.cpp in Sources */,
 				2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */,
-				2140BF3E28F73140002B1E33 /* lu.cpp in Sources */,
+				2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */,
+				2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */,
 				21FEA12C28F075080070C7F7 /* main.cpp in Sources */,
+				2142775728F9624B009EBA0D /* test_helmholtz.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

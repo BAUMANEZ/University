@@ -50,7 +50,7 @@ public:
     std::vector<double> col_at(size_t i) const;
     matrix submatrix(size_t n, size_t m, size_t i = 0, size_t j = 0) const;
     
-//MARK: Operators
+//MARK: - Operators
     matrix operator+(const matrix& rhs);
     matrix operator-(const matrix& rhs);
     matrix operator*(const matrix& rhs);
