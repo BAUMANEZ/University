@@ -14,7 +14,7 @@ void algorithm::helmholtz(
     func2d values,
     std::array<func2d, 4> boundary
 ) {
-    const double h = 0.1;
+    const double h = 0.2;
     const grid1d x(abscissa[0], abscissa[1], h);
     const grid1d y(ordinate[0], ordinate[1], h);
     matrix result(x.steps(), y.steps(), 0.);
@@ -35,11 +35,17 @@ void algorithm::helmholtz(
     do {
         ++iterations;
         previous = result;
-        for (size_t i = 1; i < x.steps()-1; ++i) {
-            for (size_t j = 1; j < y.steps()-1; ++j) {
-                result.mutable_elem(i, j) = gamma*values(x[i], y[j]) + div*(previous.elem(i+1, j)+previous.elem(i-1, j)+previous.elem(i, j+1)+previous.elem(i, j-1));
-            }
-        }
+        for (size_t i = 1; i < x.steps()-1; ++i)
+            for (size_t j = 1; j < y.steps()-1; ++j)
+                result.mutable_elem(i, j) = gamma*values(x[i], y[j])+div*(previous.elem(i+1, j)+previous.elem(i-1, j)+previous.elem(i, j+1)+previous.elem(i, j-1));
     } while (norms::frobenius(previous, result) > __DBL_EPSILON__);
+    
+    std::cout << result;
+    matrix test(x.steps(), y.steps(), 0.);
+    for (size_t i = 1; i < x.steps()-1; ++i)
+        for (size_t j = 1; j < y.steps()-1; ++j)
+            test.mutable_elem(i, j) = (1-x[i])*x[i]*sin(M_PI*y[j]);
+    std::cout << test;
+        
     std::cout << "Number of iterations=" << std::max(0, (int)iterations-1) << "\n";
 }
