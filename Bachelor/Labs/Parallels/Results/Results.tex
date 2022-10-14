@@ -1,0 +1,55 @@
+\documentclass[12pt,a4paper]{article} 
+
+\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc} 
+\usepackage[utf8]{inputenc} 
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{multirow,array}
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs, multirow} % for borders and merged ranges
+\usepackage{soul}% for underlines
+% \usepackage[table]{xcolor} % for cell colors
+\usepackage{changepage,threeparttable} % for wide tables
+
+\frenchspacing 
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\newcommand{\picref}[1]{рис. \ref{#1}}
+\newcommand{\tabref}[1]{таблица \ref{#1}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\dhalf}{\dfrac{1}{2}}
+\newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}
+
+
+\begin{document}
+
+\begin{table}[!htp]
+    \centering
+    \scriptsize
+    \begin{tabular}{|l|r|r|r|r|r|r|r|r|r|}
+    \hline
+    \textbf{Размер матрицы} &\multicolumn{4}{c}{\textbf{Неблочный алгоритм}} &\multicolumn{4}{|c|}{\textbf{Блочный алгоритм}} \\
+    \hline
+    &\multicolumn{2}{c|}{Последовательный} &\multicolumn{2}{c}{Параллельный} &\multicolumn{2}{|c}{Последовательный} &\multicolumn{2}{|c|}{Параллельный} \\
+    \hline
+    &Время &Норма &Время &Норма &Время &Норма &Время &Норма \\
+    \hline
+    512 & &$2.1 \cdot 10^{-10}$ & &$2.1 \cdot 10^{-10}$ & &$3.5 \cdot 10^{-9}$ & &$3.5 \cdot 10^{-9}$ \\
+    \hline
+    1024 & &$3.6 \cdot 10^{-10}$ & &$3.6 \cdot 10^{-10}$ & &$5.2 \cdot 10^{-9}$ & &$5.2 \cdot 10^{-9}$ \\
+    \hline
+    2048 & &$1.7 \cdot 10^{-9}$ & &$1.7 \cdot 10^{-9}$ & &$2.8 \cdot 10^{-9}$ & &$2.8 \cdot 10^{-9}$ \\
+    \hline
+    4096 & &$8.5 \cdot 10^{-9}$ & &$8.5 \cdot 10^{-9}$ & &$1.0 \cdot 10^{-9}$ & &$1.0 \cdot 10^{-9}$ \\
+    \hline
+    \end{tabular}
+    \end{table}
+\end{document}

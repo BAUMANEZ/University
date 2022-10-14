@@ -9,9 +9,10 @@
 /* Begin PBXBuildFile section */
 		2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3628F72CB7002B1E33 /* norms.cpp */; };
 		2140BF3E28F73140002B1E33 /* lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* lu.cpp */; };
-		216C90A928F1835F00F3A88C /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216C90A728F1835F00F3A88C /* algorithm.cpp */; };
+		216C90A928F1835F00F3A88C /* algorithm_lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216C90A728F1835F00F3A88C /* algorithm_lu.cpp */; };
 		2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2196E7D528F0BAB70018B18F /* helpers.cpp */; };
 		21BBD51C28F097610043676E /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BBD51B28F097610043676E /* matrix.cpp */; };
+		21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz.cpp */; };
 		21FEA12C28F075080070C7F7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21FEA12B28F075080070C7F7 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -32,12 +33,13 @@
 		2140BF3728F72CB7002B1E33 /* norms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = norms.hpp; sourceTree = "<group>"; };
 		2140BF3C28F73140002B1E33 /* lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lu.cpp; sourceTree = "<group>"; };
 		2140BF3D28F73140002B1E33 /* lu.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lu.hpp; sourceTree = "<group>"; };
-		216C90A728F1835F00F3A88C /* algorithm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
+		216C90A728F1835F00F3A88C /* algorithm_lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm_lu.cpp; sourceTree = "<group>"; };
 		216C90A828F1835F00F3A88C /* algorithm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = algorithm.hpp; sourceTree = "<group>"; };
 		2196E7D528F0BAB70018B18F /* helpers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = helpers.cpp; sourceTree = "<group>"; };
 		2196E7D628F0BAB70018B18F /* helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = helpers.hpp; sourceTree = "<group>"; };
 		21BBD51628F0915C0043676E /* matrix.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = matrix.hpp; sourceTree = "<group>"; };
 		21BBD51B28F097610043676E /* matrix.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrix.cpp; sourceTree = "<group>"; };
+		21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm_helmholtz.cpp; sourceTree = "<group>"; };
 		21FEA12828F075080070C7F7 /* Parallels */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Parallels; sourceTree = BUILT_PRODUCTS_DIR; };
 		21FEA12B28F075080070C7F7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,7 +94,8 @@
 			isa = PBXGroup;
 			children = (
 				216C90A828F1835F00F3A88C /* algorithm.hpp */,
-				216C90A728F1835F00F3A88C /* algorithm.cpp */,
+				216C90A728F1835F00F3A88C /* algorithm_lu.cpp */,
+				21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz.cpp */,
 			);
 			path = algorithm;
 			sourceTree = "<group>";
@@ -201,8 +204,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				21BBD51C28F097610043676E /* matrix.cpp in Sources */,
-				216C90A928F1835F00F3A88C /* algorithm.cpp in Sources */,
+				216C90A928F1835F00F3A88C /* algorithm_lu.cpp in Sources */,
 				2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */,
+				21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz.cpp in Sources */,
 				2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */,
 				2140BF3E28F73140002B1E33 /* lu.cpp in Sources */,
 				21FEA12C28F075080070C7F7 /* main.cpp in Sources */,

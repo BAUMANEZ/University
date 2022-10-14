@@ -17,7 +17,7 @@
 struct lu_test {
     enum method { block, non_block };
     
-    static void run(method method);
+    static void run(method method, bool paralleled);
 };
 
 #endif /* lu_hpp */

@@ -25,6 +25,21 @@ void algorithm::lu_decomposition(matrix& A) {
         }
     }
 }
+void algorithm::omp_lu_decomposition(matrix& A) {
+    size_t min_dim = std::min(A.rows(), A.cols());
+    for (size_t i = 0; i < min_dim; ++i) {
+        const double div = 1./A.elem(i, i);
+#pragma omp parallel for default(none) shared(A, i, div)
+            for (size_t k = i+1; k < A.rows(); ++k)
+                A.mutable_elem(k, i) *= div;
+#pragma omp parallel for default(none) shared(A, i)
+        for (size_t k = i+1; k < A.rows(); ++k) {
+            for (size_t j = i+1; j < A.cols(); ++j) {
+                A.mutable_elem(k, j) -= A.elem(k, i)*A.elem(i, j);
+            }
+        }
+    }
+}
 void algorithm::blu_decomposition(matrix& A, const size_t block) {
     assert_message(A.rows() == A.cols(), "Matrix must be squared");
     matrix submatrix(A.rows(), block, 0.);
@@ -57,6 +72,30 @@ void algorithm::blu_decomposition(matrix& A, const size_t block) {
             for (size_t m = i; m < i+block; ++m)
                 for (size_t l = i+block; l < A.rows(); ++l)
                     A.mutable_elem(k, l) -= A.elem(k, m)*A.elem(m, l); //A33[k, l] -= L32[k, m]*U23[m, l]
+    }
+}
+void algorithm::omp_blu_decomposition(matrix& A, const size_t block) {
+    assert_message(A.rows() == A.cols(), "Matrix must be squared");
+    matrix submatrix(A.rows(), block, 0.);
+    for (size_t i = 0; i < A.rows()-1; i += block) {
+        for (size_t k = i; k < A.rows(); ++k)
+            for (size_t l = i; l < i+block; ++l)
+                submatrix.mutable_elem(k-i, l-i) = A.elem(k, l);
+        algorithm::lu_decomposition(submatrix);
+        for (size_t k = i; k < A.rows(); ++k)
+            for (size_t l = i; l < i+block; ++l)
+                A.mutable_elem(k, l) = submatrix.elem(k-i, l-i);
+        
+        for (size_t k = i+1; k < i+block; ++k)
+            for (size_t l = i+block; l < A.rows(); ++l)
+                for (size_t m = i; m < k; ++m)
+                    A.mutable_elem(k, l) -= A.elem(k, m)*A.elem(m, l);
+        
+#pragma omp parallel for default(none) shared(A, i, block)
+        for (size_t k = i+block; k < A.rows(); ++k)
+            for (size_t m = i; m < i+block; ++m)
+                for (size_t l = i+block; l < A.rows(); ++l)
+                    A.mutable_elem(k, l) -= A.elem(k, m)*A.elem(m, l);
     }
 }
 matrix algorithm::lu_multiplication(const matrix& A) {
