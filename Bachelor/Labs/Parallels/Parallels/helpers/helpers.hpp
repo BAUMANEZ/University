@@ -9,12 +9,27 @@
 #define helpers_hpp
 
 #include <vector>
+#include <string>
+#include <sstream>
+#include <cassert>
 #include <functional>
 #include "math.h"
 
 #define assert_message(exp, msg) assert(((void)msg, exp))
 
 typedef std::function<double(double, double)> func2d;
+
+std::string cut(double number, size_t n) {
+    std::stringstream stream;
+    stream << number;
+    const std::string string = stream.str();
+    const size_t endIndex = string.size() <= n ? string.size() : n;
+    return string.substr(0, endIndex);
+}
+
+bool is_odd(size_t n) {
+   return (n & 1);
+}
 
 inline int number_of_digits(double num, int precision = 16) {
     int digits = 0;

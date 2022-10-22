@@ -17,15 +17,16 @@ public class Advection1D: Algorithm1D {
         return c*time.step/space.step
     }
     
-    public init(a : Double,
-                b : Double,
-                T : Double,
-                c : Double,
-                h : Double,
-                u : @escaping (Double, Time) -> Double,
-                u0: @escaping (Double) -> Double,
-                sigma: Double,
-                profile: String?
+    public init(
+        a : Double,
+        b : Double,
+        T : Double,
+        c : Double,
+        h : Double,
+        u : @escaping (Double, Time) -> Double,
+        u0: @escaping (Double) -> Double,
+        sigma: Double,
+        profile: String?
     ) {
         self.c = c
         self.u = u
@@ -33,8 +34,12 @@ public class Advection1D: Algorithm1D {
         self.profile = profile
         super.init(a: a, b: b, h: h, tau: sigma*h/c, deadline: T)
     }
-    
-    public convenience init(c: Double = 1.0, h: Double = 1.0, sigma: Double, profile: Profile) {
+    public convenience init(
+        c: Double = 1.0,
+        h: Double = 1.0,
+        sigma: Double,
+        profile: Profile
+    ) {
         let u = { x, t in return profile.f(x: x-c*t) }
         self.init(a: profile.l1, b: profile.L, T: profile.T, c: c, h: h, u: u, u0: profile.f, sigma: sigma, profile: profile.description)
     }
@@ -46,7 +51,6 @@ public class Advection1D: Algorithm1D {
     public override func f(x: Double, t: Double) -> Double? {
         return drift(for: t, in: x)
     }
-    
     public override func solve() {
         let solutions = time.nodes(starting: 1).reduce(into: [Time: Mesh]()) { solutions, t in
             solutions[t] = space.nodes().reduce(into: Mesh()) { mesh, x in

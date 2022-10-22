@@ -177,13 +177,8 @@ std::ostream& operator<<(std::ostream& out, const matrix& ref) {
     out << "\n";
     for (size_t i = 0; i < ref.n; ++i) {
         out << "┋ ";
-        for (size_t j = 0; j < ref.m; ++j) {
-            std::stringstream stream;
-            stream << ref.elem(i, j);
-            const std::string string = stream.str();
-            const size_t endIndex = string.size() <= precision ? string.size() : precision;
-            out << std::right << std::setw(widths[j]+1) << string.substr(0, endIndex) << std::setw(1) << " ┋ ";
-        }
+        for (size_t j = 0; j < ref.m; ++j)
+            out << std::right << std::setw(widths[j]+1) << cut(ref.elem(i, j), precision) << std::setw(1) << " ┋ ";
         out << "\n";
         out << dashes.str();
         out << "\n";

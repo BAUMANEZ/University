@@ -10,19 +10,15 @@ import Foundation
 public class InterpolatedAdvection1D: Advection1D {
     public typealias DetailedMesh = [Node: Double]
     public var detailed: [Int: DetailedMesh] = [:]
-    
     public var identifier: String? {
         return nil
     }
-    
     private final var substep: Double {
         return 100.0
     }
-    
     private final var plotStep: Int {
         return time.steps/5
     }
-    
     private final var metadata: Data? {
         let json: [String: Any] = [
             "type"   : "Advection",
@@ -65,7 +61,6 @@ public class InterpolatedAdvection1D: Advection1D {
         }
         return result
     }
-    
     public final var normL: Double {
         time.range(starting: 1).reduce(into: Double()) { global, j in
             guard detailed[j] != nil else { return () }
@@ -142,9 +137,6 @@ public class InterpolatedAdvection1D: Advection1D {
         time.range(starting: 1).forEach{ solve(for: $0) }
         var solutions: [Time: Mesh] = [:]
         for j in Swift.stride(from: 0, through: time.steps, by: plotStep) {
-//            let limit = 40
-//            let stride = 1
-//        for j in Swift.stride(from: 0, through: limit*stride, by: stride) {
             guard detailed[j] != nil else { continue }
             let t = time.node(for: j)
             solutions[t] = space.nodes().reduce(into: Mesh()) { mesh, node in
@@ -169,7 +161,6 @@ public class InterpolatedAdvection1D: Advection1D {
             save(file: identifier, data: data(for: solutions), meta: metadata)
         }
     }
-    
     public func solve(for j: Int) {
         detailed[j] = [:]
         let jP = j-1
@@ -185,7 +176,6 @@ public class InterpolatedAdvection1D: Advection1D {
             detailed[j]?[x] = f
         }
     }
-    
     private func flow(j: Int, xB: Node) -> Double? {
         let xL: Node
         let x : Node
@@ -203,11 +193,6 @@ public class InterpolatedAdvection1D: Advection1D {
               let yL = detailed[j]?[xL],
               let yR = detailed[j]?[xR]
         else { return .zero }
-//        let delta = delta(yL: yL, yR: yR)
-//        let sixth = sixth(yL: yL, y: y, yR: yR)
-//        let avg = c > 0 ? yR-0.5*gamma*(delta-sixth*(1.0-2.0/3.0*gamma)) : yL+0.5*gamma*(delta-sixth*(1-2.0/3.0*gamma))
-//        return c*avg
-//
         let boundary = c > 0 ? xR.value : xL.value
         let f1 = c*(Nf(x: boundary-c*time.step, xL: xL, yL: yL, y: y, yR: yR))
         let f2 = c*(Nf(x: boundary-0.5*c*time.step, xL: xL, yL: yL, y: y, yR: yR))

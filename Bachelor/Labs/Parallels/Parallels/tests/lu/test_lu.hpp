@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <time.h>
+#include "omp.h"
 #include "../../matrix/core/matrix.hpp"
 #include "../../matrix/algorithm/algorithm.hpp"
 #include "../../matrix/norms/norms.hpp"

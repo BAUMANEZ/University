@@ -60,7 +60,6 @@
 			isa = PBXGroup;
 			children = (
 				21ED477F284414B3001D61FA /* Algorithm1D.swift */,
-				216B5DF8284F87DC0025025E /* Node.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -79,6 +78,7 @@
 			children = (
 				215A0FB528463CE5002C8DED /* Algorithm.swift */,
 				21C6F86B2848C036005846C7 /* Grid.swift */,
+				216B5DF8284F87DC0025025E /* Node.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -173,7 +173,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1340;
+				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					21ED477328441439001D61FA = {
 						CreatedOnToolsVersion = 13.4;

@@ -1,0 +1,517 @@
+\documentclass[12pt,a4paper]{article} 
+
+\usepackage{fn2kursstyle}
+\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc} 
+\usepackage[utf8]{inputenc} 
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{multirow,array}
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+
+\counterwithout{equation}{section}
+\counterwithout{figure}{section}
+\graphicspath{{pic/}}
+\frenchspacing 
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\newcommand{\picref}[1]{рис. \ref{#1}}
+\newcommand{\tabref}[1]{таблица \ref{#1}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\dhalf}{\dfrac{1}{2}}
+\newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}
+
+\title{Упругие характеристики поликристаллических металлов \\ Вариант 15 \\ $\alpha$-Fe+Cd}
+\group{ФН2-72Б}
+\author{А.\,И.~Токарев}
+\supervisor{И.\,Ю.~Савельева}
+\date{2022}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section-{Постановка задачи}
+
+Для заданной пары чистых металлов ($\alpha$-$Fe$ -- железо, $Cd$ -- кадмий) по значению коэффициентов упругости (или податливости) кристаллов вычислить элементы матрицы коэффициентов податливости (или упругости), сравнив точность обращения матриц с вычислением по формулам, и построить графики зависимостей линейной податливости от направления единичного вектора для гексагональной кристаллической решетки в плоскости, содержащей оптическую ось кристалла, а для кубической кристаллической решетки в плоскости грани и в плоскостях, содержащих диагонали грани и куба. Для кристаллической решетки каждого из металлов определить направления, по которым линейная податливость имеет экстремальные значения. Найти отношение полуосей эллипсоида вращения, образующегося после действия всестороннего давления на шар из металла с ГПУ кристаллической решеткой.
+
+Для каждого из металлов в предположении хаотической ориентации зерен в поликристалле найти верхнюю и нижнюю оценки продольной упругости и сравнить полученные значения с вычисленными для случая статистически усредненной шаровой формы кристаллических зерен. Провести аналогичные расчеты и построить графики для пористого двухфазного сплава-смеси заданной пары металлов при трех фиксированных значениях объемной пористости, равных 0; 0.1 и 0.2, в зависимости от отношения $\dfrac{V_1}{(V_1+V_2)}\in [0;1]$, где $V_1$ и $V_2$ --- объемные доли металлов в сплаве.
+
+\begin{table}[htb!]
+	\centering	
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        $\alpha$-Fe & $C_{11}$ & $C_{12}$ & $C_{14}$ \\
+        \hline
+        ГПа & 234 & 135 & 114 \\
+        \hline
+    \end{tabular}
+    \qquad
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Cd & $S_{11}$ & $S_{12}$ & $S_{13}$ & $S_{33}$ & $S_{44}$ \\
+        \hline
+        TПа$^{-1}$ & 12.4 & -0.76 & -9.97 & 37.5 & 63.7 \\
+        \hline
+    \end{tabular}
+    \vspace*{3mm}
+    \caption{Коэффициенты упругости и податливости}
+    \label{tab1}
+\end{table}
+
+\newpage
+
+\section-{Список условных обозначений}
+
+\noindent\begin{tabular}{cp{0.7\textwidth}}
+
+	$C$ & --- матрица коэффициентов упругости \\
+	$C_{ij}$ & --- элементы матрицы $C$ $(i, j = \overline{1,6})$ \\
+	$S$ & --- матрица коэффициентов податливости \\
+	$S_{ij}$ & --- элементы матрицы $S$ $(i, j = \overline{1,6})$ \\
+	$\vec{n} = \{n_1,n_2,n_3\}$ & --- единичный вектор нормали, заданный в кристаллографических осях. Компоненты $n_i$ --- проекции на $Ox^'_i$ \\
+	$S_n$ & --- линейная податливость в направлении $\vec{n}$ \\
+	$e^{(\vec n)}$ &--- относительное удлинение в направлении $\vec n$\\
+	$\sigma_{kl}$ & ---  компоненты тензора напряжений $\hat{\sigma}$ $(k, l = \overline{1,3})$\\
+	$S_{ijkl}$ & --- компоненты тензора податливости $\hat{S}$ $(i, j,k,l = \overline{1,3})$ \\
+	$\varepsilon_{kl}$ & --- компоненты тензора малой деформации $\hat{\varepsilon}$ $(k, l = \overline{1,3})$\\
+	$p$ & --- давление\\
+	$\delta_{ij}$ & --- символ Кронекера \\
+	$V_0$ & --- контрольный объем\\
+	$I_{ijkl}$ & --- единичный тензор 4-го ранга $(i, j,k,l = \overline{1,3})$\\
+	$\nu$ & --- коэффициент Пуассона\\
+	$C_{ijkl}$ & --- компоненты тензора коэффициентов упругости $\hat{C}$ $(i, j,k,l = \overline{1,3})$ \\
+	$C^o_{ijkl}$ & --- эффективные упругие характеристики поликристалла $(i, j,k,l = \overline{1,3})$ \\
+	$S^o_{ijkl}$ & --- эффективные характеристики податливости поликристалла $(i, j,k,l = \overline{1,3})$ \\
+	$\omega_{ijkl}$ & --- тензор Эшелби $(i, j,k,l = \overline{1,3})$\\
+\end{tabular}
+
+\newpage
+
+\section{Матрицы податливости и упругости для различных типов решеток}
+
+\subsection{Кубическая решетка}
+
+В кристаллах с кубической решеткой матрицы коэффицентов податливости $S$ и упругости $C$ содержат лишь по $3$ независимых и отличных от нуля коэффициента:
+\[
+    C=
+    \begin{pmatrix}
+    C_{11} & C_{12} & C_{12} & 0 & 0 & 0\\
+    C_{12} & C_{11} & C_{12} & 0 & 0 & 0\\
+    C_{12} & C_{12} & C_{11} & 0 & 0 & 0\\
+    0 & 0 & 0 & C_{44} & 0 & 0\\
+    0 & 0 & 0 & 0 & C_{44} & 0\\
+    0 & 0 & 0 & 0 & 0 & C_{44} 
+    \end{pmatrix},  
+\]
+\\
+\[
+    S=
+    \begin{pmatrix}
+    S_{11} & S_{12} & S_{12} & 0 & 0 & 0\\
+    S_{12} & S_{11} & S_{12} & 0 & 0 & 0\\
+    S_{12} & S_{12} & S_{11} & 0 & 0 & 0\\
+    0 & 0 & 0 & S_{44} & 0 & 0\\
+    0 & 0 & 0 & 0 & S_{44} & 0\\
+    0 & 0 & 0 & 0 & 0 & S_{44} 
+    \end{pmatrix}.  
+\]
+\\
+Обращение $С$ дает следующие расчетные формулы для ненулевых элементов матрицы $S\colon$
+\[
+    S_{11}=\frac{C_{11}+C_{12}}{C_K}, \quad S_{12}=-\frac{C_{12}}{C_K}, \quad S_{44}=\frac{1}{C_{44}}, \qquad C_K=(C_{11}-C_{12})(C_{11}+2C_{12}).  
+\]
+
+Пользуясь системой компьютерной алгебры Wolfram Mathematica, получим эти значения:
+\[
+    S_{11} = 7.4, \quad S_{12} = -2.7, \quad S_{13} = 8.8, \qquad S_{ij} = [\text{ТПа}^{-1}].
+\]
+
+Если вычислять эти коэффициенты путем обращения матрицы $C$, то можно оценить точность заданных формул:
+\[
+  \| S - C^{-1} \|  = 2 \cdot 10^{-27}
+\]
+
+\subsection{Гексагональная решетка}
+
+В кристаллах с гексагональной решеткой в матрицах $S$ и $C$ уже присутствуют по $5$ независимых компонент:
+\[
+    S=
+    \begin{pmatrix}
+    S_{11} & S_{12} & S_{13} & 0 & 0 & 0\\
+    S_{12} & S_{11} & S_{13} & 0 & 0 & 0\\
+    S_{13} & S_{13} & S_{33} & 0 & 0 & 0\\
+    0 & 0 & 0 & S_{44} & 0 & 0\\
+    0 & 0 & 0 & 0 & S_{44} & 0\\
+    0 & 0 & 0 & 0 & 0 & S_{66} 
+    \end{pmatrix}.
+\]
+\\
+\[
+    C=
+    \begin{pmatrix}
+    C_{11} & C_{12} & C_{13} & 0 & 0 & 0\\
+    C_{12} & C_{11} & C_{13} & 0 & 0 & 0\\
+    C_{13} & C_{13} & C_{33} & 0 & 0 & 0\\
+    0 & 0 & 0 & C_{44} & 0 & 0\\
+    0 & 0 & 0 & 0 & C_{44} & 0\\
+    0 & 0 & 0 & 0 & 0 & C_{66} 
+    \end{pmatrix},
+\]
+\\
+\noindent где $S_{66}=2(S_{11}-S_{12})$ и $C_{66}=\frac{1}{2}(C_{11}-C_{12})$. 
+
+Обращение $S$ дает следующие расчетные формулы для ненулевых элементов матрицы $C\colon$
+\[
+    \begin{split}
+        &C_{11}=\frac{S_{33}}{2 S_r}+\frac{1/2}{S_{11}-S_{12}}, \quad C_{12}=\frac{S_{33}}{2 S_r}-\frac{1/2}{S_{11}-S_{12}}, \quad C_{13}=-\frac{S_{13}}{S_r}, \quad  C_{33}=\frac{S_{11}+S_{12}}{S_r}, 
+        \\[0.7em]
+        &C_{44}=\frac{1}{S_{44}}, \quad C_{66}=\frac{1}{S_{66}}, \qquad S_r=(S_{11}+S_{12})S_{33}-2S_{13}^2.  
+    \end{split}
+\]
+
+Вычисляя эти значения, получим:
+\[
+    \begin{split}
+    C_{11} = 116.9, \quad C_{12} = 40.9, \quad C_{13}= 42, \quad C_{33} = 49, \quad C_{44} = 15.7, \quad &C_{66} = 38,
+    \\
+    & C = [\text{ГПа}].
+    \end{split}
+\]
+
+А норма ошибки составляет:
+\[
+    \| C - S^{-1} \| = 1.5 \cdot 10^{-5}.
+\]
+
+\section{Зависимость линейной податливости
+от направления единичного вектора}
+
+Податливость кристаллов с кубическими решетками в направлении действия рас-
+тягивающей или сжимающей силы равна:
+\begin{gather}
+    \label{podatCr}
+    S_n=S_{11}-S_{44} (S^*-1)(n_1^2 n_2^2+n_2^2 n_3^2+n_3^2 n_1^2),
+    \\[0.7em]
+    S^*=2 \frac{S_{11}-S_{12}}{S_{44}}. \notag
+\end{gather}
+
+Из формулы \refeq{podatCr} видно, что при $S^* = 1$ податливость не зависит от направления силы.
+
+Податливость кристаллов с ГПУ-решетками зависит от угла между оптической кристаллографической осью $Ox^'_3$ и направлением силы:
+\begin{equation}
+    S_n=S_{11} (1-n_3^2)+S_{33} n_3^4+(2 S_{13}+S_{44})n_3^2(1-n_3^2),   
+\end{equation}
+\noindent где $\vec n = (n_1, n_2, n_3)^T$ -- единичный вектор, определяющий направление силы.
+
+\subsection{Линейная податливость для Cd (ГПУ)}
+
+Рассмотрим случай, когда $\vec n$ лежит в плоскости, содержащей оптическую ось кристалла. Из этого следует, что $n_3 = \cos \gamma$, где $\gamma = \widehat{\bigl(\vec n, Ox^{'}_3 \bigr)}$, $\gamma \in \Bigl[ 0, \dfrac{\pi}{2} \Bigr]$.
+
+\pagebreak
+
+\begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{II_1.pdf}}
+	\caption{График линейной податливости в плоскости, содержащей оптическую ось кристалла}
+	\label{pic:CdOpt}
+\end{figure}
+
+\subsection{Линейная податливость для $\alpha$-Fe (Кубическая кристаллическая решетка)}
+
+\subsubsection{Единичный вектор в плоскости грани}
+
+Есть три плоскости, содержащие начало координат кристаллографической системы:
+\begin{enumerate}
+	\item $\vec{n}\in \pi_1: \, n_3=0, \, n_1=\cos{\alpha}, \, n_2=\sin{\alpha}, \, \alpha \in \left[0; \, \dfrac{\pi}{2}\right]$.\\
+	\item $\vec{n}\in \pi_2: \, n_2=0, \, n_1=\cos{\beta}, \, n_3=\sin{\beta}, \, \beta \in \left[0; \, \dfrac{\pi}{2}\right]$.\\
+	\item $\vec{n}\in \pi_3: \, n_1=0, \, n_2=\cos{\gamma}, \, n_3=\sin{\gamma}, \, \gamma \in \left[0; \, \dfrac{\pi}{2}\right]$.\\
+\end{enumerate}
+
+Достаточно рассмотреть один из трех случаев. Выберем $\vec n \in \pi_1$. Подставив эти значения в (\refeq{podatCr}), получим:
+\[
+    S_n(\alpha) = S_n(\cos{\alpha},\sin{\alpha},0)=S_{11}-(2(S_{11}-S_{12})-S_{44}) \cos^2{\alpha} \sin^2{\alpha}.
+\]
+
+\pagebreak
+
+\begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{I_1.pdf}}
+	\caption{График линейной податливости в плоскости грани куба}
+	\label{pic:FeOpt}
+\end{figure}
+
+\subsection{Вектор находится в плоскости, содержащей диагонали двух граней, имеющие общую точку}
+
+Пусть первая диагональ лежит в лоскости $\pi_{2}$, вторая --- в $\pi_{3}$, а общая точка --- начало координат. Векторы $\vec{b_{1}}=\vec{i}+\vec{k},~~ \vec{b_{2}}=\vec{j}+\vec{k},$ лежат на этих диагоналях, следовательно, в рассматриваемой плоскости. Но не ортогональны, потому что $\cos{\widehat{\vec{b_{1}}, \vec{b_{2}}}}=\frac{1}{2}.$
+Ортогонализируем по алгоритму Грама-Шмидта:
+
+\begin{gather*}
+\vec{e_{1}}=\frac{\vec{b_{1}}}{\|\vec{b_{1}}\|}=\sqrt{2}(\vec{i}+\vec{k}),
+\end{gather*}
+
+\begin{gather*}
+	\vec{d_{2}}=\vec{b_{2}}-\langle \vec{e_{1}}, \vec{b_{2}} \rangle \vec{e_{1}}=-\frac{1}{2}\vec{i}+\vec{j}+\frac{1}{2}\vec{k},
+ 		\end{gather*}
+		
+\begin{gather*}
+	\vec{e_{2}}=\frac{\vec{d_{2}}}{\|\vec{d_{2}}\|}=-\frac{1}{6}\vec{i}+\sqrt{\frac{2}{3}}\vec{j}+\frac{1}{\sqrt{6}}\vec{k}.
+ 		\end{gather*}
+
+Тогда вектор $\vec{e_{3}}$ определим:
+\begin{gather*}
+	\vec{e_{3}}=\vec{e_{1}} \times \vec{e_{2}}=-\frac{1}{\sqrt{3}}\vec{i}-\frac{1}{\sqrt{3}}\vec{j}+\frac{1}{\sqrt{3}}\vec{k}.
+\end{gather*}
+
+\begin{gather*}
+	A_{\mathcal{B} \rightarrow \mathcal{E}}=
+	\begin{pmatrix}
+  \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{6}} & -\frac{1}{\sqrt{3}}\\
+  0 & \sqrt{\frac{2}{3}} & -\frac{1}{\sqrt{3}}\\
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{6}} & \frac{1}{\sqrt{3}}
+\end{pmatrix} 
+	\end{gather*}
+ Тогда получим
+ \begin{gather*}
+		\begin{align}
+			\begin{pmatrix}
+				   n_{1} \\
+				   n_{2} \\
+				   n_{3}
+				 \end{pmatrix} =
+				 \begin{pmatrix}
+					\frac{1}{\sqrt{2}}\cos{\alpha} -\frac{1}{\sqrt{6}}\sin{\alpha} \\
+  \sqrt{\frac{2}{3}}\sin{\alpha}\\
+  \frac{1}{\sqrt{2}}\cos{\alpha} + \frac{1}{\sqrt{6}}\sin{\alpha} 
+\end{pmatrix}
+ \end{align}
+ \end{gather*}
+ В случае, если $\pi \in \Bigl[0;~\dfrac{\pi}{3}\Bigr]$ вектор $\vec{n}$ расположен внутри куба и плоскости $-x_{1}-x_{2}+x_{3}=0.$ Получим зависимость:
+ \[
+	S_n(\alpha) = S_n \Bigl( \dfrac{1}{\sqrt 2} \cos \alpha - \dfrac{1}{\sqrt 6} \sin \alpha, \sqrt{\dfrac{2}{3}} \sin \alpha, \dfrac{1}{\sqrt 2} \cos \alpha + \dfrac{1}{\sqrt 6} \sin \alpha \Bigr).
+ \] 
+
+ \begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{I_2.pdf}}
+	\caption{График $\S_n(\alpha), 0 \leq \alpha \leq \dfrac{\pi}{3}$}
+	\label{pic:FeOpt2}
+\end{figure}
+
+ Получаем, что графиком функции является прямая, параллельная оси абсцисс. Полученный результат закономерен, так как $n_1^2 n_2^2 + n_2^2 n_3^2 + n_3^2 n_1^2 = \dfrac{1}{4}$.
+
+ \subsection{Единичный вектор лежит в плоскости, содержащей диагонали грани и куба, имеющие общую точку}
+
+ Пусть диагональ грани лежит в плоскости $\pi_3$, диагональ куба проходит через начало координат. Векторы $\vec b_1 = \vec i + \vec k, \vec b_2 = \vec i + \vec j + \vec k$ лежат на этих диагоналях, а следовательно и в рассматриваем плоскости. Но они не ортогональны, так как $ \cos{\Bigl(\widehat{\vec b_1, \vec b_2}\Bigr)} = \sqrt{\dfrac{2}{3}} $. Применим к ним процесс ортогонализации Грама-Шмидта.
+ \[
+	\vec e_1 = \dfrac{\vec b_1}{\| \vec b_1 \|} = \dfrac{1}{\sqrt 2}\bigl( \vec i + \vec k \bigr),
+ \]
+ \[
+	\vec d_2 = \vec b_2 - \langle \vec e_1, \vec b_2 \rangle \vec e_1 = \vec j,
+ \]
+ \[
+ 	\vec e_2 = \vec j.
+ \]
+
+ Оставшийся вектор $\vec e_3$ определим из соотношения
+ \[
+	\vec e_3 = \vec e_1 \times \vec e_2 = \dfrac{1}{\sqrt 2}\Bigl( -\vec i + \vec k \Bigr)
+ \]
+
+ Выберем $\vec e_1, \vec e_2, \vec e_3 $ в качестве базиса $e$. Тогда
+ \[
+	\mathcal A_{\mathcal B \rightarrow \mathcal \Epsilon} = 
+	\begin{pmatrix}
+		\dfrac{1}{\sqrt 2} & 0 & -\dfrac{1}{\sqrt 2} \\ 
+		0 & 1 & 0 \\
+		\dfrac{1}{\sqrt 2} & 0 & \dfrac{1}{\sqrt 2}
+	\end{pmatrix},
+ \]
+
+ \[
+	\begin{pmatrix}
+		n1 \\
+		n2 \\
+		n3	
+	\end{pmatrix} = \begin{pmatrix}
+		\dfrac{1}{\sqrt 2} \cos \alpha \\
+		\sin \alpha \\
+		\dfrac{1}{\sqrt 2} \cos \alpha
+	\end{pmatrix}.
+ \]
+
+ При $\alpha \in \Bigr[ 0, \dfrac{\pi}{2} \Bigl]$ вектор $ \vec n $ расположен внутри куба в плоскости $ -x_1 + x_3 = 0 $. Получим зависимость 
+ \[
+	S_n(\alpha) = S_n \Bigl( \dfrac{1}{\sqrt 2} \cos \alpha, \sin \alpha, \dfrac{1}{\sqrt 2} \cos \alpha \Bigr).
+ \] 
+
+ \begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{I_3.pdf}}
+	\caption{График $S_n(\alpha), 0 \leq \alpha \leq \dfrac{\pi}{2}$}
+	\label{pic:FeOpt3}
+\end{figure}
+
+ \subsection{Единичный вектор лежит в плоскости, содержащей диагональ куба и ребро, имеющие общую точку}
+
+ Пусть диагональ куба проходит через начало координат, ребро лежит на оси $x_1.$ Векторы $ \vec e_1 = \vec i, \vec b_2 = \vec i + \vec j + \vec k $ лежат на ребре и диагонали соответсвенно, а следовательно, и в рассматриваемой плоскости. Но они не ортогональны, так как $\cos{\Bigl( \widehat{\vec e_1, \vec b_2} \Bigr)} = \dfrac{1}{\sqrt 3}$. Применим к ним процесс ортогонализации Грама-Шмидта: 
+ \[
+	\vec d_2 = \vec b_2 - \langle \vec e_1, \vec b_2 \rangle \vec e_1 = \vec j + \vec k,
+ \]
+\[
+	\vec e_2 = \dfrac{1}{\sqrt 2}\Bigl(\vec j + \vec k \Bigr).	
+\]
+
+Оставшийся вектор $\vec e_3$ определим из соотношения 
+\[
+	\vec e_3 = \vec e_1 \times \vec e_2 = \dfrac{1}{\sqrt 2}\Bigl(\vec j + \vec k\Bigr).	
+\]
+
+Выберем $\vec e_1, \vec e_2, \vec e_3 $ в качестве базиса $\mathcal \Epsilon$. Тогда 
+\[
+	\mathcal A_{\mathcal B \rightarrow \mathcal \Epsilon} = \begin{pmatrix}
+		1 & 0 & 0 \\
+		0 & \dfrac{1}{\sqrt 2} & -\dfrac{1}{\sqrt 2} \\[1em]
+		0 & \dfrac{1}{\sqrt 2} & \dfrac{1}{\sqrt 2}	
+	\end{pmatrix},
+\]
+
+\[
+	\begin{pmatrix}
+		n1 \\
+		n2 \\
+		n3	
+	\end{pmatrix} = \begin{pmatrix}
+		\cos \alpha \\[0.2em]
+		\dfrac{1}{\sqrt 2} \sin \alpha \\[1em]
+		\dfrac{1}{\sqrt 2} \sin \alpha
+	\end{pmatrix}.
+ \]
+
+ При $\alpha \in \Bigr[ 0, \dfrac{\pi}{2} \Bigl]$ вектор $ \vec n $ расположен внутри куба в плоскости $ -x_2 + x_3 = 0 $. Получим зависимость 
+ \[
+	S_n(\alpha) = S_n \Bigl( \cos \alpha, \dfrac{1}{\sqrt 2} \sin \alpha, \dfrac{1}{\sqrt 2} \sin \alpha \Bigr).
+ \] 
+
+ \begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{I_4.pdf}}
+	\caption{График $S_n(\alpha), 0 \leq \alpha \leq \dfrac{\pi}{2}$}
+	\label{pic:FeOpt4}
+\end{figure}
+
+ Рассмотренная в предыдущем разделе плоскость удовлетворяет условиям этого пункта, то есть \picref{pic:FeOpt3} подходит и для рассматриваемого в данном пункте случая. Заметим, что если повернуть плоскость \picref{pic:FeOpt4} на угол $\pi$ по оси, совпадающей с осью $OS_n$, то с помощью преобразования параллельного переноса можно совместить кривые на \picref{pic:FeOpt4} и \picref{pic:FeOpt4}.
+
+ Приведем графики, соответствующие в одной системе координат: 
+ 
+ \begin{figure}[h]
+	\center{\includegraphics[width=0.8\textwidth]{I_5.pdf}}
+	\caption{График $S_n(\alpha), 0 \leq \alpha \leq \dfrac{\pi}{2}$}
+	\label{pic:FeOpt5}
+\end{figure}
+
+ Заметим, что при малых значениях параметра $\alpha$ графики на \picref{pic:FeOpt5} практически совпадают. Объяснить результат можно следующим образом. Если преобразовать тригонометрическое выражение, которое присутствует в $S_n(\alpha) = S_n \Bigl( \cos \alpha, \dfrac{1}{\sqrt 2} \sin \alpha, \dfrac{1}{\sqrt 2} \sin \alpha \Bigr)$, то получим:
+ \[
+	\begin{split}
+	\cos^2 \alpha \Bigl( \dfrac{1}{\sqrt 2} \sin \alpha \Bigr)^2 + \cos^2 \alpha \Bigl( \dfrac{1}{\sqrt 2} \sin \alpha \Bigr)^2 &+ \Bigl( \dfrac{1}{\sqrt 2} \sin \alpha \Bigr)^2 \Bigl( \dfrac{1}{\sqrt 2} \sin \alpha \Bigr)^2 = \\[0.7em]
+	& = \cos^2 \alpha \sin^ 2 \alpha + \dfrac{\sin^4 \alpha}{4}.
+	\end{split}
+ \]
+
+ При сравнении полученного выражения с тригонометрическим выражением из 
+ \[
+	S_n(\alpha) = S_n(\cos \alpha, \sin \alpha, 0)
+ \]
+
+ \noindent видно, что эти выражения отличаются друг от друга на величину четвертого порядка малости при $\alpha \rightarrow 0$.
+
+ \pagebreak
+
+ \section{Верхняя и нижняя оценки параметров $\lambda$, $\mu$, $E$, $\nu$}
+
+ Для изотропных сред известно:
+ \begin{gather*}
+    \lambda = \dfrac{1}{9}C^0_{iikk}, \quad \dfrac{1}{\lambda} = S^0_{iikk}, \qquad i, k = 1, 2, 3,
+    \\[0.7em]
+    \mu = \dfrac{1}{10}\Bigl( C^0_{ikik} - \dfrac{1}{3}C^0_{iikk} \Bigr), \quad \dfrac{1}{\mu} = \dfrac{2}{5}\Bigl( S^0_{ikik} - \dfrac{1}{3} S^0_{iikk} \Bigr), \qquad i, k = 1, 2, 3,
+    \\[0.7em]
+    \dfrac{1}{E} = \dfrac{1}{9 \lambda} + \dfrac{1}{3\mu}, \quad \nu = \dfrac{E}{2\mu} - 1.
+ \end{gather*}
+
+ Данные выражения можно упростить, группируя парные индексы:
+ \[
+    \begin{split}
+        &C_{iikk} = C_{11} + C_{22} + C_{33} + 2C_{12} + 2C_{13} + 2C_{23},
+        \\
+        &C_{ikik} = C_{11} + C_{22} + C_{33} + 2C_{66} + 2C_{55} + 2C_{44},
+        \\
+        &S_{iikk} = S_{11} + S_{22} + S_{33} + 2S_{12} + 2S_{13} + 2S_{23},
+        \\
+        &S_{ikik} = S_{11} + S_{22} + S_{33} + \dfrac{S_{66}}{2} + \dfrac{S_{55}}{2} + \dfrac{S_{44}}{2}.
+    \end{split}
+ \]
+
+ \subsection{Кубичесукая кристаллическая решетка}
+ \begin{gather*}
+    \lambda^+ = \dfrac{1}{3}(C_{11} + C_{12}), \quad \dfrac{1}{\lambda^-} = 3(S_{11} + 2S_{12}),
+    \\[0.7em]
+    \mu^+ = \dfrac{1}{5}(C_{11} - C_{12} + 3C_{44}), \quad \dfrac{1}{\mu^-} = \dfrac{1}{5}(4(S_{11} - S_{12} + 3S_{44}),
+    \\[0.7em]
+    E^+ = \dfrac{1}{\tfrac{1}{9 \lambda^-} + \tfrac{1}{3\mu^-}}, \quad E^- = \dfrac{1}{\tfrac{1}{9 \lambda^+} + \tfrac{1}{3\mu^+}},
+    \\[0.7em]
+    \nu^+ = \dfrac{E^-}{2\mu^-} - 1, \quad \nu^- = \dfrac{E^+}{2\mu^+} - 1.
+ \end{gather*}
+
+ Для $\alpha$-Fe эти величины равны соответственно:
+
+ \begin{table}
+    \centering
+    \begin{tabular}[htb!]{|c|c|c|c|c|c|c|c|}
+        \hline 
+        $\lambda^-$ & $\lambda^+$ & $\mu^-$ & $\mu^+$ & $E^-$ & $E^+$ & $\nu^-$ & $\nu^+$ \\
+        \hline 
+        $168.0$ & $168.0$ & $74.94$ & $88.2$ & $195.7$ & $225.2$ & $0.28$ & $0.305$ \\
+        \hline
+    \end{tabular}
+    \vspace{3mm}
+    \caption{Оценка параметров Ламе, модуля упругости и коэффициента Пуассона для железа}
+ \end{table}
+
+ \subsection{ГПУ}
+ \begin{gather*}
+    \lambda^+ = \dfrac{1}{9}(2C_{11} + C_{33} + 2(C_{12} + 2C_{13})), \quad \dfrac{1}{\lambda^-} = 2(S_{11} + 2S_{12}),
+    \\[0.7em]
+    \mu^+ = \dfrac{1}{30}(7C_{11} - 5C_{12} - 4C_{13} + 2C_{33} + 12C_{44}), \quad \dfrac{1}{\mu^-} = \dfrac{2}{15}(7S_{11} + 2S_{33} + 3S_{44} - 5S_{12} - 4S_{13}),
+    \\[0.7em]
+    E^+ = \dfrac{1}{\tfrac{1}{9 \lambda^-} + \tfrac{1}{3\mu^-}}, \quad E^- = \dfrac{1}{\tfrac{1}{9 \lambda^+} + \tfrac{1}{3\mu^+}},
+    \\[0.7em]
+    \nu^+ = \dfrac{E^-}{2\mu^-} - 1, \quad \nu^- = \dfrac{E^+}{2\mu^+} - 1.
+ \end{gather*}
+
+ Для Cd эти величины равны соответственно:
+ \begin{table}
+    \centering
+    \begin{tabular}[htb!]{|c|c|c|c|c|c|c|c|}
+        \hline 
+        $\lambda^-$ & $\lambda^+$ & $\mu^-$ & $\mu^+$ & $E^-$ & $E^+$ & $\nu^-$ & $\nu^+$ \\
+        \hline 
+        $168.0$ & $168.0$ & $74.94$ & $88.2$ & $195.7$ & $225.2$ & $0.28$ & $0.305$ \\
+        \hline
+    \end{tabular}
+    \vspace{3mm}
+    \caption{Оценка параметров Ламе, модуля упругости и коэффициента Пуассона для железа}
+ \end{table}
+
+ \pagebreak
+
+\begin{thebibliography}{6}
+\bibitem{zarkuv}	Зарубин В.С. Математические модели механики и электродинамики сплошной среды. [Текст]/ В.С. Зарубин, Г.Н. Кувыркин -- Москва: Издательство МГТУ им. Н.Э. Баумана, 2008. -- 512~с.
+\bibitem{zar} Зарубин В.С. Прикладные задачи термопрочности элементов конструкций. [Текст] -- Москва: Машиностроение, 1985. -- 296 с.  
+\bibitem{zarkuvsav} Зарубин В.С. Физические и математические модели микромеханики: учебное пособие. [Текст]/ В.С. Зарубин, Г.Н. Кувыркин, И.Ю. Савельева -- Москва: Москва: Издательство МГТУ им. Н.Э. Баумана, 2020. -- 194 с.
+\end{thebibliography}
+
+\end{document}

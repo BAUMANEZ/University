@@ -16,7 +16,9 @@
     #include "./tests/helmholtz/test_helmholtz.hpp"
 //MARK: - when run from terminal/sublime/vscode
 #else
+    #include "omp.h"
     #include "./matrix/core/matrix.cpp"
+    #include "./grid/1d/grid1d.cpp"
     #include "./matrix/algorithm/algorithm_lu.cpp"
     #include "./matrix/algorithm/algorithm_helmholtz.cpp"
     #include "./matrix/norms/norms.cpp"
@@ -40,7 +42,9 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
 }
 
 int main(int argc, const char * argv[]) {
-//    test_lu::run(test_lu::block, false);
-    test_helmholtz::run(false);
+    test_lu::run(test_lu::block, false);
+    test_lu::run(test_lu::non_block, false);
+
+    // test_helmholtz::run(true);
     return 0;
 }
