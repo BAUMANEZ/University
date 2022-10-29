@@ -1,9 +1,0 @@
-compute-0-2
---------------------------------------------------------------------------
-There are not enough slots available in the system to satisfy the 6 slots 
-that were requested by the application:
-  ./Helmholtz
-
-Either request fewer slots for your application, or make more slots available
-for use.
---------------------------------------------------------------------------

@@ -19,14 +19,14 @@
 
  struct algorithm final {
 //MARK: - LU
-     static void lu_decomposition(matrix& A);
-     static void blu_decomposition(matrix& A, const size_t block);
-     static matrix lu_multiplication(const matrix& A);
+    static void lu_decomposition(matrix& A);
+    static void blu_decomposition(matrix& A, const size_t block);
+    static matrix lu_multiplication(const matrix& A);
      
 //MARK: - Helmholtz
  public:
-     static void helmholtz_red_black(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
-     static void helmholtz_jacobi(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
+    static void helmholtz_red_black(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
+    static void helmholtz_jacobi(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
 };
 
 #endif /* algorithm_hpp */

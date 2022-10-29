@@ -10,7 +10,7 @@
 void test_lu::run(method method, bool paralleled) {
     omp_set_num_threads(paralleled ? 18 : 1);
     std::cout << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n\n";
-    for (size_t n = 512; n <= 4096; n *= 2) {
+    for (size_t n = 512; n <= 8192; n *= 2) {
         matrix lu_test(n, n, -1000., 1000.);
         // matrix lu_test(test);
         std::cout << "Random ";
@@ -24,7 +24,7 @@ void test_lu::run(method method, bool paralleled) {
                 break;
             case block:
                 std::cout << "BLU Decomposition: ";
-                for (size_t block = 32; block <= 64; block += 32) {
+                for (size_t block = 32; block <= 32; block += 32) {
                     double start = omp_get_wtime();
                     algorithm::blu_decomposition(lu_test, block);
                     const double end = omp_get_wtime()-start;

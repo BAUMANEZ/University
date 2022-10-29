@@ -44,7 +44,8 @@ matrix::matrix(std::vector<std::vector<double>> nested) {
 matrix::matrix(const matrix& copy) {
     this->n = copy.n;
     this->m = copy.m;
-    this->values = copy.values;
+    this->values = new double[n*m];
+    std::memcpy(values, copy.values, n*m);
 }
 matrix::matrix(matrix&& rvalue) noexcept {
     this->n = rvalue.n;
@@ -100,7 +101,9 @@ matrix matrix::operator*(const matrix& rhs) {
 void matrix::operator=(const matrix& rhs) {
     n = rhs.n;
     m = rhs.m;
-    values = rhs.values;
+    delete[] values;
+    values = new double[n*m];
+    std::memcpy(values, rhs.values, n*m);
 }
 void matrix::operator=(matrix&& rhs) {
     n = rhs.n;

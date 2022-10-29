@@ -1,8 +1,0 @@
-compute-0-2
-compute-0-2
-JacobiHelmholtzSolver : time = 5.75558
-SRJacobiHelmholtzSolver : time = 8.85262
-IJacobiHelmholtzSolver : time = 9.32419
-SeidelHelmholtzSolver : time = 8.14655
-SRSeidelHelmholtzSolver : time = 8.26819
-ISeidelHelmholtzSolver : time = 8.23508

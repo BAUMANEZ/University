@@ -42,12 +42,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
 }
 
 int main(int argc, const char * argv[]) {
-    test_lu::run(test_lu::non_block, false);
-    test_lu::run(test_lu::non_block, true);
-    test_lu::run(test_lu::block, false);
-    test_lu::run(test_lu::block, true);
-
-    // test_helmholtz::run(false);
+    test_helmholtz::run(false);
     // test_helmholtz::run(true);
     return 0;
 }
