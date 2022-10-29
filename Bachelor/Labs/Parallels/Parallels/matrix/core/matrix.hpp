@@ -19,7 +19,7 @@
 
 struct matrix final {
 private:
-    std::vector<double> values;
+    double* values;
     size_t n;
     size_t m;
     
@@ -37,25 +37,19 @@ public:
     matrix(std::vector<std::vector<double>> nested);
     matrix(const matrix& copy);
     matrix(matrix&& rvalue) noexcept;
-    
-//MARK: - Setters
-    void resize(size_t n, double fill);
-    void resize(size_t n, size_t m, double fill);
+    ~matrix();
     
 //MARK: - Contents
 public:
     double elem(size_t i, size_t j) const;
     double& mutable_elem(size_t i, size_t j);
-    std::vector<double> row_at(size_t i) const;
-    std::vector<double> col_at(size_t i) const;
-    matrix submatrix(size_t n, size_t m, size_t i = 0, size_t j = 0) const;
     
 //MARK: - Operators
     matrix operator+(const matrix& rhs);
     matrix operator-(const matrix& rhs);
     matrix operator*(const matrix& rhs);
     void   operator=(const matrix& rhs);
-    void   operator=(const matrix&& rhs);
+    void   operator=(matrix&& rhs);
     
 //MARK: - Linear Algebra Modifications
     void invert();
@@ -64,6 +58,7 @@ public:
 //MARK: - Service
 public:
     friend std::ostream& operator<<(std::ostream& out, const matrix& ref);
+    static void swap(matrix& lhs, matrix& rhs);
     static matrix make_identity(size_t n);
     static matrix make_identity(size_t n, size_t m);
 };

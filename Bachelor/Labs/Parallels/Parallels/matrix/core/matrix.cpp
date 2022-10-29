@@ -13,12 +13,13 @@ matrix::matrix(size_t n, double l, double r): matrix(n, n, l, r) {}
 matrix::matrix(size_t n, size_t m, double initial) {
     this->n = n;
     this->m = m;
-    this->values = std::vector<double>(n*m, initial);
+    this->values = new double[n*m];
+    for (size_t i = 0; i < n*m; ++i) values[i] = initial;
 }
 matrix::matrix(size_t n, size_t m, double l, double r) {
     this->n = n;
     this->m = m;
-    (this->values).resize(n*m);
+    this->values = new double[n*m];
     for (size_t i = 0; i < n; ++i)
         for (size_t j = 0; j < m; ++j) {
             double k = double(rand())/RAND_MAX;
@@ -34,10 +35,10 @@ matrix::matrix(std::vector<std::vector<double>> nested) {
     }
     this->n = nested.size();
     this->m = nested[0].size();
-    (this->values).reserve(n*m);
-    for (auto it = nested.begin(); it<nested.end(); ++it) {
-        assert_message((*it).size()==m, "Number of cols is not equal in each row");
-        (this->values).insert((this->values.end()), (*it).begin(), ((*it).end()));
+    this->values = new double[n*m];
+    for (size_t i = 0; i < n; ++i) {
+        assert_message(nested[i].size() == m, "Number of cols is not equal in each row");
+        for (size_t j = 0; j < m; ++j) mutable_elem(i, j) = nested[i][j];
     }
 }
 matrix::matrix(const matrix& copy) {
@@ -48,67 +49,29 @@ matrix::matrix(const matrix& copy) {
 matrix::matrix(matrix&& rvalue) noexcept {
     this->n = rvalue.n;
     this->m = rvalue.m;
-    this->values = std::move(rvalue.values);
+    delete[] values;
+    this->values = rvalue.values;
+    rvalue.values = nullptr;
 }
-
-//MARK: - Setters
-void matrix::resize(size_t n, double fill) {
-    resize(n, n, fill);
-}
-void matrix::resize(size_t n, size_t m, double fill) {
-    const matrix copy(*this);
-    this->n = n;
-    this->m = m;
-    values = std::vector<double>(n*m, fill);
-    const size_t min_n = std::min(n, copy.n);
-    const size_t min_m = std::min(m, copy.m);
-    for (size_t i = 0; i < min_n; ++i) {
-        const size_t copy_row = i*copy.m;
-        const size_t new_row = i*m;
-        std::copy(
-            copy.values.begin()+copy_row,
-            copy.values.begin()+copy_row+min_m,
-            values.begin()+new_row
-        );
-    }
+matrix::~matrix() {
+    delete[] values;
 }
 
 //MARK: - Contents
 double matrix::elem(size_t i, size_t j) const {
-    assert_message(i<n, "Accessing out of bounds row of matrix. That's illegal");
-    assert_message(j<m, "Accessing out of bounds col of matrix. That's illegal");
+    // assert_message(i<n, "Accessing out of bounds row of matrix. That's illegal");
+    // assert_message(j<m, "Accessing out of bounds col of matrix. That's illegal");
     return values[i*m+j];
 }
 double& matrix::mutable_elem(size_t i, size_t j) {
-    assert_message(i<n, "Accessing out of bounds row of matrix. That's illegal");
-    assert_message(j<m, "Accessing out of bounds col of matrix. That's illegal");
+    // assert_message(i<n, "Accessing out of bounds row of matrix. That's illegal");
+    // assert_message(j<m, "Accessing out of bounds col of matrix. That's illegal");
     return values[i*m+j];
-}
-std::vector<double> matrix::row_at(size_t i) const {
-    std::vector<double> result;
-    std::copy(values.begin()+i*m, values.begin()+(i+1)*m, std::back_inserter(result));
-    return result;
-}
-std::vector<double> matrix::col_at(size_t j) const {
-    std::vector<double> result;
-    result.reserve(m);
-    for (auto it = values.begin(); it < values.end(); it += m)
-        result.push_back(*(it+j));
-    return result;
-}
-matrix matrix::submatrix(size_t n, size_t m, size_t i, size_t j) const {
-    assert_message(i+n<=this->n, "Submatrix has more rows than the original");
-    assert_message(j+m<=this->m, "Submatrix has more cols than the original");
-    matrix result(n, m, 0.);
-    for (size_t k = i; k < i+n; ++k)
-        for (size_t l = j; l < j+m; ++l)
-            result.mutable_elem(k-i, l-j) = elem(k, l);
-    return result;
 }
 
 //MARK: - Operators
 matrix matrix::operator+(const matrix& rhs) {
-    assert_message(n == rhs.n && m == rhs.m, "Dimensions are not equal");
+    // assert_message(n == rhs.n && m == rhs.m, "Dimensions are not equal");
     matrix result(*this);
     for (size_t i = 0; i < n; ++i)
         for (size_t j = 0; j < m; ++j)
@@ -116,7 +79,7 @@ matrix matrix::operator+(const matrix& rhs) {
     return result;
 }
 matrix matrix::operator-(const matrix& rhs) {
-    assert_message(n == rhs.n && m == rhs.m, "Dimensions are not equal");
+    // assert_message(n == rhs.n && m == rhs.m, "Dimensions are not equal");
     matrix result(*this);
     for (size_t i = 0; i < n; ++i)
         for (size_t j = 0; j < m; ++j)
@@ -124,14 +87,12 @@ matrix matrix::operator-(const matrix& rhs) {
     return result;
 }
 matrix matrix::operator*(const matrix& rhs) {
-    assert_message(m == rhs.n, "Cols(I) is not equal to Rows(II)");
+    // assert_message(m == rhs.n, "Cols(I) is not equal to Rows(II)");
     matrix result(n, rhs.m, 0.);
     for (size_t i = 0; i < n; ++i) {
-//        const std::vector<double> i_row = row_at(i);
         for (size_t k = 0; k < m; ++k) {
-//            const std::vector<double> i_col = rhs.row_at(k);
             for (size_t j = 0; j < rhs.m; ++j)
-                result.mutable_elem(i, j) += elem(i, k)*rhs.elem(k, j);//i_row[k]*i_col[j];
+                result.mutable_elem(i, j) += elem(i, k)*rhs.elem(k, j);
         }
     }
     return result;
@@ -141,10 +102,12 @@ void matrix::operator=(const matrix& rhs) {
     m = rhs.m;
     values = rhs.values;
 }
-void matrix::operator=(const matrix&& rhs) {
+void matrix::operator=(matrix&& rhs) {
     n = rhs.n;
     m = rhs.m;
-    values = std::move(rhs.values);
+    delete[] values;
+    values = rhs.values;
+    rhs.values = nullptr;
 }
 
 //MARK: - Linear Algebra Modifications
@@ -185,6 +148,11 @@ std::ostream& operator<<(std::ostream& out, const matrix& ref) {
     }
     out << "\n";
     return out;
+}
+void matrix::swap(matrix& lhs, matrix& rhs) {
+    std::swap(lhs.n, rhs.n);
+    std::swap(lhs.m, rhs.m);
+    std::swap(lhs.values, rhs.values);
 }
 matrix matrix::make_identity(size_t n) {
     return matrix::make_identity(n, n);

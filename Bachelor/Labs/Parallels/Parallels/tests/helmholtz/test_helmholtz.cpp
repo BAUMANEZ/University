@@ -20,11 +20,13 @@ void test_helmholtz::run(bool paralleled) {
     const func2d u_10 = [](double x, double y) -> double { return 0.; };
     const func2d u_11 = [](double x, double y) -> double { return 0.; };
 
+    omp_set_num_threads(paralleled ? 8 : 1);
+
     double start = omp_get_wtime();
-    paralleled ? algorithm::omp_helmholtz_red_black(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11}) : algorithm::helmholtz_red_black(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
+    algorithm::helmholtz_red_black(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
     std::cout << "Time=" << omp_get_wtime()-start << "\n\n";
 
     start = omp_get_wtime();
-    paralleled ? algorithm::omp_helmholtz_jacobi(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11}) : algorithm::helmholtz_jacobi(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
+    algorithm::helmholtz_jacobi(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
     std::cout << "Time=" << omp_get_wtime()-start << "\n\n";
 }

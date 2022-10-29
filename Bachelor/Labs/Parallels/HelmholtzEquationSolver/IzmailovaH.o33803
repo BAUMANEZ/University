@@ -1,0 +1,12 @@
+compute-0-2
+compute-0-2
+compute-0-1
+compute-0-1
+compute-0-0
+compute-0-0
+JacobiHelmholtzSolver : time = 0.647788
+SRJacobiHelmholtzSolver : time = 0.645916
+IJacobiHelmholtzSolver : time = 0.351863
+SeidelHelmholtzSolver : time = 0.646066
+SRSeidelHelmholtzSolver : time = 0.645782
+ISeidelHelmholtzSolver : time = 0.350847

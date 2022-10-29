@@ -1,9 +1,9 @@
 #!/bin/sh
-#SBATCH --job-name=LU_Tokarev
+#SBATCH --job-name=Tokarev
 #SBATCH --time=01:00:00
 #SBATCH --nodes=1 --cpus-per-task=18
 #SBATCH --partition=release
 ulimit -l unlimited
 
-icpc -O1 -fopenmp -o run main.cpp
+icpc -O2 -fopenmp -o run main.cpp
 mpirun -np 1 /nethome/student/FS19/FS2-x2/Tokarev/Parallels/run
