@@ -43,6 +43,6 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
 
 int main(int argc, const char * argv[]) {
     test_helmholtz::run(false);
-    // test_helmholtz::run(true);
+    test_helmholtz::run(true);
     return 0;
 }

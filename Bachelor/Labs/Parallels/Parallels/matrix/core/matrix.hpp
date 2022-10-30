@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <cstdint>
+#include <cstring>
 #include <math.h>
 #include "../../helpers/helpers.hpp"
 

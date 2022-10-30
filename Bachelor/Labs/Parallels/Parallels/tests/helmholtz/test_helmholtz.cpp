@@ -8,12 +8,13 @@
 #include "test_helmholtz.hpp"
 
 void test_helmholtz::run(bool paralleled) {
-    omp_set_num_threads(paralleled ? 8 : 1);
+    std::cout << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n";
+    omp_set_num_threads(paralleled ? 18 : 1);
 
-    const size_t t = 50;
+    const size_t t = 320;
     const size_t n =  t*10;
-    const double k = double(t)*2.0;
-    const double h = 1/double(n - 1);
+    const double h = 1./double(n - 1);
+    const double k = double(t)*20.0;
     const func2d values = [k](double x, double y) -> double {
         return 2*sin(M_PI*y) + pow(k, 2)*(1-x)*x*sin(M_PI*y) + pow(M_PI, 2)*(1-x)*x*sin(M_PI*y);
     };
@@ -39,15 +40,24 @@ void test_helmholtz::run(bool paralleled) {
         for (size_t j = 1; j < y.steps()-1; ++j)
             analytical.mutable_elem(i, j) = (1-x[i])*x[i]*sin(M_PI*y[j]);
 
+    matrix copy_test(test);
 
+    //MARK: Red-Black
+    double start = omp_get_wtime();
+    size_t iterations_red_black = algorithm::helmholtz_red_black(test, k, h, x, y, values);
+    std::cout << "Time=" << omp_get_wtime()-start << "\n";
+    std::cout << "Frobenius norm(Red-black)=" << norms::frobenius(test, analytical) << "\n";
+    std::cout << "Max error norm(Red-black)=" << norms::max_error(test, analytical) << "\n";
+    std::cout << "Number of iterations(Red-black)=" << std::max(0, (int)iterations_red_black-1) << "\n";
 
+    //MARK: Jacobi
+    start = omp_get_wtime();
+    size_t iterations_jacobi = algorithm::helmholtz_jacobi(copy_test, k, h, x, y, values);
+    std::cout << "Time=" << omp_get_wtime()-start << "\n";
+    std::cout << "Frobenius norm(Jacobi)=" << norms::frobenius(copy_test, analytical) << "\n";
+    std::cout << "Max error norm(Jacobi)=" << norms::max_error(copy_test, analytical) << "\n";
+    std::cout << "Number of iterations(Jacobi)=" << std::max(0, (int)iterations_jacobi-1) << "\n";
 
-
-    // double start = omp_get_wtime();
-    // algorithm::helmholtz_red_black(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
-    // std::cout << "Time=" << omp_get_wtime()-start << "\n\n";
-
-    // start = omp_get_wtime();
-    // algorithm::helmholtz_jacobi(k, h, {0, 1}, {0, 1}, values, {u_00, u_01, u_10, u_11});
-    // std::cout << "Time=" << omp_get_wtime()-start << "\n\n";
+    std::cout << "END OF " << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n";
+    std::cout << "\n\n";
 }

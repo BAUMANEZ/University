@@ -25,8 +25,22 @@
      
 //MARK: - Helmholtz
  public:
-    static void helmholtz_red_black(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
-    static void helmholtz_jacobi(const double k, const double h, std::array<double, 2> abscissa, std::array<double, 2> ordinate, func2d values, std::array<func2d, 4> boundary);
+    static size_t helmholtz_red_black(
+        matrix& result,
+        const double k, 
+        const double h, 
+        const grid1d& x,
+        const grid1d& y,
+        const func2d& values
+    );
+   static size_t helmholtz_jacobi(
+        matrix& result,
+        const double k, 
+        const double h, 
+        const grid1d& x,
+        const grid1d& y,
+        const func2d& values
+    );
 };
 
 #endif /* algorithm_hpp */
