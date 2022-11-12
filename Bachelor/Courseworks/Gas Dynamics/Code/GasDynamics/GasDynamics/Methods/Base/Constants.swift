@@ -1,8 +1,5 @@
-//
-//  Constants.swift
-//  GasDynamics
-//
-//  Created by Арсений Токарев on 09.11.2022.
-//
-
 import Foundation
+
+func speedOfSound(density: Double, pressure: Double, gamma: Double) -> Double {
+    return sqrt(gamma*pressure/density)
+}

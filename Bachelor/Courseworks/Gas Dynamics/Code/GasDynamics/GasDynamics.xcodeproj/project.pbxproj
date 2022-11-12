@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		214194E5290FBCC100E6A496 /* Gas1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214194E4290FBCC100E6A496 /* Gas1D.swift */; };
 		215A0FB228463B25002C8DED /* Advection1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215A0FB128463B25002C8DED /* Advection1D.swift */; };
 		215A0FB628463CE5002C8DED /* Algorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215A0FB528463CE5002C8DED /* Algorithm.swift */; };
 		216B5DF7284F72F70025025E /* Interpolated1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216B5DF6284F72F70025025E /* Interpolated1D.swift */; };
@@ -15,6 +16,8 @@
 		21C6F86F2848C4EB005846C7 /* ArticleProfiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F86E2848C4EB005846C7 /* ArticleProfiles.swift */; };
 		21C6F8762848CDF6005846C7 /* PPM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F8752848CDF6005846C7 /* PPM.swift */; };
 		21C6F8782848CDFB005846C7 /* PPML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F8772848CDFB005846C7 /* PPML.swift */; };
+		21E8255C291C366900A918CA /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21E8255B291C366900A918CA /* Matrix.swift */; };
+		21E8255E291C3BB200A918CA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21E8255D291C3BB200A918CA /* Constants.swift */; };
 		21ED477828441439001D61FA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED477728441439001D61FA /* main.swift */; };
 		21ED4780284414B3001D61FA /* Algorithm1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED477F284414B3001D61FA /* Algorithm1D.swift */; };
 /* End PBXBuildFile section */
@@ -32,6 +35,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		214194E4290FBCC100E6A496 /* Gas1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gas1D.swift; sourceTree = "<group>"; };
 		215A0FB128463B25002C8DED /* Advection1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Advection1D.swift; sourceTree = "<group>"; };
 		215A0FB528463CE5002C8DED /* Algorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithm.swift; sourceTree = "<group>"; };
 		216B5DF6284F72F70025025E /* Interpolated1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpolated1D.swift; sourceTree = "<group>"; };
@@ -40,6 +44,8 @@
 		21C6F86E2848C4EB005846C7 /* ArticleProfiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleProfiles.swift; sourceTree = "<group>"; };
 		21C6F8752848CDF6005846C7 /* PPM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPM.swift; sourceTree = "<group>"; };
 		21C6F8772848CDFB005846C7 /* PPML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPML.swift; sourceTree = "<group>"; };
+		21E8255B291C366900A918CA /* Matrix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
+		21E8255D291C3BB200A918CA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		21ED477428441439001D61FA /* GasDynamics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GasDynamics; sourceTree = BUILT_PRODUCTS_DIR; };
 		21ED477728441439001D61FA /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		21ED477F284414B3001D61FA /* Algorithm1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithm1D.swift; sourceTree = "<group>"; };
@@ -56,41 +62,59 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		215A0FB328463C5F002C8DED /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				21ED477F284414B3001D61FA /* Algorithm1D.swift */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
-		21B1F371284624C900C30E7C /* 1D */ = {
-			isa = PBXGroup;
-			children = (
-				215A0FB328463C5F002C8DED /* Base */,
-				21C6F86D2848C4D5005846C7 /* Advection1D */,
-			);
-			path = 1D;
-			sourceTree = "<group>";
-		};
-		21C6F86A2848C028005846C7 /* Base */ = {
+		214194E0290FBBC400E6A496 /* Algorithm */ = {
 			isa = PBXGroup;
 			children = (
 				215A0FB528463CE5002C8DED /* Algorithm.swift */,
-				21C6F86B2848C036005846C7 /* Grid.swift */,
-				216B5DF8284F87DC0025025E /* Node.swift */,
+				21ED477F284414B3001D61FA /* Algorithm1D.swift */,
 			);
-			path = Base;
+			path = Algorithm;
 			sourceTree = "<group>";
 		};
-		21C6F86D2848C4D5005846C7 /* Advection1D */ = {
+		214194E1290FBBDE00E6A496 /* Advection */ = {
+			isa = PBXGroup;
+			children = (
+				214194E2290FBBE600E6A496 /* 1D */,
+			);
+			path = Advection;
+			sourceTree = "<group>";
+		};
+		214194E2290FBBE600E6A496 /* 1D */ = {
 			isa = PBXGroup;
 			children = (
 				215A0FB128463B25002C8DED /* Advection1D.swift */,
 				21C6F8742848CDC6005846C7 /* Schemes */,
 				21C6F8792848CE12005846C7 /* Tests */,
 			);
-			path = Advection1D;
+			path = 1D;
+			sourceTree = "<group>";
+		};
+		214194E3290FBC8F00E6A496 /* 1D */ = {
+			isa = PBXGroup;
+			children = (
+				214194E4290FBCC100E6A496 /* Gas1D.swift */,
+			);
+			path = 1D;
+			sourceTree = "<group>";
+		};
+		21B1F371284624C900C30E7C /* Gas */ = {
+			isa = PBXGroup;
+			children = (
+				214194E3290FBC8F00E6A496 /* 1D */,
+			);
+			path = Gas;
+			sourceTree = "<group>";
+		};
+		21C6F86A2848C028005846C7 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				21E8255D291C3BB200A918CA /* Constants.swift */,
+				21C6F86B2848C036005846C7 /* Grid.swift */,
+				216B5DF8284F87DC0025025E /* Node.swift */,
+				21E8255B291C366900A918CA /* Matrix.swift */,
+				214194E0290FBBC400E6A496 /* Algorithm */,
+			);
+			path = Base;
 			sourceTree = "<group>";
 		};
 		21C6F8742848CDC6005846C7 /* Schemes */ = {
@@ -140,7 +164,8 @@
 			isa = PBXGroup;
 			children = (
 				21C6F86A2848C028005846C7 /* Base */,
-				21B1F371284624C900C30E7C /* 1D */,
+				214194E1290FBBDE00E6A496 /* Advection */,
+				21B1F371284624C900C30E7C /* Gas */,
 			);
 			path = Methods;
 			sourceTree = "<group>";
@@ -210,8 +235,11 @@
 				21C6F8782848CDFB005846C7 /* PPML.swift in Sources */,
 				216B5DF7284F72F70025025E /* Interpolated1D.swift in Sources */,
 				21ED477828441439001D61FA /* main.swift in Sources */,
+				21E8255E291C3BB200A918CA /* Constants.swift in Sources */,
 				21ED4780284414B3001D61FA /* Algorithm1D.swift in Sources */,
+				21E8255C291C366900A918CA /* Matrix.swift in Sources */,
 				21C6F86C2848C036005846C7 /* Grid.swift in Sources */,
+				214194E5290FBCC100E6A496 /* Gas1D.swift in Sources */,
 				215A0FB228463B25002C8DED /* Advection1D.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

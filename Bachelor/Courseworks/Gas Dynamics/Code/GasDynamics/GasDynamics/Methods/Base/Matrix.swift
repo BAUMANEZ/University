@@ -6,3 +6,76 @@
 //
 
 import Foundation
+
+
+struct Matrix: CustomStringConvertible,
+               CustomDebugStringConvertible
+{
+    // MARK: - Internal properties
+    
+    fileprivate(set) var n: Int
+    fileprivate(set) var m: Int
+    
+    var description: String {
+        return """
+        MATRIX, dim=(\(n), \(m))
+        \(values.description)
+        """
+    }
+    
+    var debugDescription: String {
+        return description
+    }
+    
+    // MARK: - Private properties
+    
+    fileprivate var values: [Double]
+    
+    // MARK: - Initializers
+    
+    init(n: Int = 0, initial: Double = 0.0) {
+        self.init(n: n, m: n, initial: initial)
+    }
+    
+    init(n: Int, m: Int, initial: Double = 0.0) {
+        self.n = n
+        self.m = m
+        self.values = [Double](repeating: initial, count: n*m)
+    }
+    
+    // MARK: - Operators
+    
+    subscript(i: Int, j: Int) -> Double {
+        get {
+            assert(i < n, "Wrong row")
+            assert(j < m, "Wrong col")
+            
+            return values[i*m+j]
+        }
+        mutating set {
+            assert(i < n, "Wrong row")
+            assert(j < m, "Wrong col")
+            
+            return values[i*m+j] = newValue
+        }
+    }
+    
+    // MARK: - Internal methods
+}
+
+extension Matrix {
+    
+    // MARK: - R_x in 1-D
+    static func R1D(density: Double, pressure: Double, gamma: Double) -> Matrix {
+        var result = Matrix(n: 3, initial: 0.0)
+        
+        return result
+    }
+    
+    // MARK: - L_x in 1-D
+    static func L1D(density: Double, pressure: Double, gamma: Double) -> Matrix {
+        var result = Matrix(n: 3, initial: 0.0)
+        
+        return result
+    }
+}

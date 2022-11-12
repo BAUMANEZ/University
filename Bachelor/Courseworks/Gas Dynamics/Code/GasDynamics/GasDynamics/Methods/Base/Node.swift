@@ -7,23 +7,16 @@
 
 import Foundation
 
-public struct Node: Hashable, Comparable {
-    public let value: Double
-    public let side: Side
+ struct Node: Hashable, Comparable {
     
-    public static func < (lhs: Node, rhs: Node) -> Bool {
-        guard Swift.abs(lhs.value-rhs.value) > Double.leastNormalMagnitude else {
-            return lhs.side < rhs.side
-        }
-        return lhs.value < rhs.value
-    }
+    //MARK: - Nested types
     
-    public enum Side: Int, Hashable, Comparable {
+     enum Side: Int, Hashable, Comparable {
         case left
         case middle
         case right
         
-        public static func < (lhs: Node.Side, rhs: Node.Side) -> Bool {
+         static func < (lhs: Node.Side, rhs: Node.Side) -> Bool {
             switch lhs {
             case .left:
                 return rhs != .left
@@ -34,4 +27,21 @@ public struct Node: Hashable, Comparable {
             }
         }
     }
+    
+    //MARK: - Static functions
+    
+     static func < (lhs: Node, rhs: Node) -> Bool {
+        guard Swift.abs(lhs.value-rhs.value) > Double.leastNormalMagnitude else {
+            return lhs.side < rhs.side
+        }
+        return lhs.value < rhs.value
+    }
+     static func == (lhs: Node, rhs: Node) -> Bool {
+        return lhs.side == rhs.side && Swift.abs(lhs.value-rhs.value) < Double.leastNormalMagnitude
+    }
+    
+    //MARK: - Properties
+    
+     let value: Double
+     let side: Side
 }
