@@ -7,18 +7,18 @@
 
 import Foundation
 
-public class Algorithm1D: Algorithm {
-    public typealias Time = Double
-    public typealias Mesh = Dictionary<Double, Double>
+ class Algorithm1D: Algorithm {
+     typealias Time = Double
+     typealias Mesh = Dictionary<Double, Double>
     
-    public let space: Grid
+     let space: Grid
     
-    public init(a: Double, b: Double, h: Double, tau: Double, deadline: Double) {
+     init(a: Double, b: Double, h: Double, tau: Double, deadline: Double) {
         self.space = Grid(start: a, end: b, step: h)
         super.init(tau: tau, deadline: deadline)
     }
     
-    public final func data(for solutions: [Time: Mesh]) -> Data? {
+     final func data(for solutions: [Time: Mesh]) -> Data? {
         let json = solutions.reduce(into: [String: Any]()) { json, solution in
             let mesh = solution.value.reduce(into: [String: String]()) { mesh, pair in
                 let x = pair.key
@@ -32,7 +32,7 @@ public class Algorithm1D: Algorithm {
         return try? JSONSerialization.data(withJSONObject: json, options: [.sortedKeys, .prettyPrinted])
     }
     
-    public func f(x: Double, t: Double) -> Double? {
+     func f(x: Double, t: Double) -> Double? {
         return nil
     }
 }

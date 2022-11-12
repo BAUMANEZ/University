@@ -7,21 +7,21 @@
 
 import Foundation
 
-public class Algorithm {
-    public let time: Grid
+ class Algorithm {
+     let time: Grid
     
-    public var data: Data? {
+     var data: Data? {
         return nil
     }
     
-    public init(tau: Double = 1.0, deadline: Double) {
+     init(tau: Double = 1.0, deadline: Double) {
         self.time = Grid(start: 0, end: deadline, step: tau)
         solve()
     }
     
-    public func solve() {}
+     func solve() {}
     
-    public final func save(file name: String, data: Data?, meta: Data? = nil) {
+     final func save(file name: String, data: Data?, meta: Data? = nil) {
         let manager = FileManager.default
         let folder = manager.homeDirectoryForCurrentUser
             .appendingPathComponent("Desktop", isDirectory: true)

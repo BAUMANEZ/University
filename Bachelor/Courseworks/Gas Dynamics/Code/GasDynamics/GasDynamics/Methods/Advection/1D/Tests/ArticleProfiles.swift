@@ -1,4 +1,4 @@
-//
+////
 //  ArticleProfiles.swift
 //  GasDynamics
 //
@@ -8,7 +8,7 @@
 import Foundation
 
 extension Advection1D {
-    public enum Profile {
+     enum Profile {
         case leftTriangle
         case rightTriangle
         case rectangle
@@ -16,15 +16,15 @@ extension Advection1D {
         case M
         case cos
         
-        public var l1 : Double { return  10.0 }
-        public var l11: Double { return  50.0/3.0 }
-        public var l12: Double { return  20.0 }
-        public var l22: Double { return  70.0/3.0 }
-        public var l2 : Double { return  30.0 }
-        public var L  : Double { return  200.0 }
-        public var T  : Double { return  200.0 }
+         var l1 : Double { return  10.0     }
+         var l11: Double { return  50.0/3.0 }
+         var l12: Double { return  20.0     }
+         var l22: Double { return  70.0/3.0 }
+         var l2 : Double { return  30.0     }
+         var L  : Double { return  200.0    }
+         var T  : Double { return  200.0    }
         
-        public func f(x: Double) -> Double {
+         func f(x: Double) -> Double {
             guard x >= l1 && x <= l2 else { return .zero }
             switch self {
             case .leftTriangle:
@@ -54,7 +54,7 @@ extension Advection1D {
             }
         }
         
-        public var description: String {
+         var description: String {
             switch self {
             case .rightTriangle: return "rightTriangle"
             case .leftTriangle : return "leftTriangle"

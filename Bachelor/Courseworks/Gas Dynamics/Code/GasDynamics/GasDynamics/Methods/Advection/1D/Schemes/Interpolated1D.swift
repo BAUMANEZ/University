@@ -7,10 +7,11 @@
 
 import Foundation
 
-public class InterpolatedAdvection1D: Advection1D {
-    public typealias DetailedMesh = [Node: Double]
-    public var detailed: [Int: DetailedMesh] = [:]
-    public var identifier: String? {
+ class InterpolatedAdvection1D: Advection1D {
+     typealias DetailedMesh = [Node: Double]
+    
+     var detailed: [Int: DetailedMesh] = [:]
+     var identifier: String? {
         return nil
     }
     private final var substep: Double {
@@ -39,7 +40,7 @@ public class InterpolatedAdvection1D: Advection1D {
         return try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted, .sortedKeys])
     }
     
-    public final var normC: Double {
+     final var normC: Double {
         var result = -Double.greatestFiniteMagnitude
         time.range(starting: 1).forEach { j in
             guard detailed[j] != nil else { return }
@@ -61,7 +62,7 @@ public class InterpolatedAdvection1D: Advection1D {
         }
         return result
     }
-    public final var normL: Double {
+     final var normL: Double {
         time.range(starting: 1).reduce(into: Double()) { global, j in
             guard detailed[j] != nil else { return () }
             global += space.nodes().reduce(into: Double()) { local, node in
@@ -89,7 +90,7 @@ public class InterpolatedAdvection1D: Advection1D {
             }
         }
     }
-    public final var normL2: Double {
+     final var normL2: Double {
         return sqrt(time.range(starting: 1).reduce(into: Double()) { global, j in
             guard detailed[j] != nil else { return () }
             global += space.nodes().reduce(into: Double()) { local, node in
@@ -117,11 +118,11 @@ public class InterpolatedAdvection1D: Advection1D {
             }
         })
     }
-    public final var normW2: Double {
+     final var normW2: Double {
         return .zero
     }
     
-    public final override func solve() {
+     final override func solve() {
         detailed[0] = space.nodes().reduce(into: DetailedMesh()) {
             let xL = Node(value: $1-space.halfed, side: .right)
             let x  = Node(value: $1, side: .middle)
@@ -161,7 +162,7 @@ public class InterpolatedAdvection1D: Advection1D {
             save(file: identifier, data: data(for: solutions), meta: metadata)
         }
     }
-    public func solve(for j: Int) {
+     func solve(for j: Int) {
         detailed[j] = [:]
         let jP = j-1
         space.nodes().forEach { node in
@@ -203,29 +204,29 @@ public class InterpolatedAdvection1D: Advection1D {
 }
 
 extension InterpolatedAdvection1D {
-    public final func delta(j: Int, xL: Node, xR: Node) -> Double? {
+     final func delta(j: Int, xL: Node, xR: Node) -> Double? {
         guard let yL = detailed[j]?[xL],
               let yR = detailed[j]?[xR]
         else { return nil }
         return delta(yL: yL, yR: yR)
     }
-    public final func delta(yL: Double, yR: Double) -> Double {
+     final func delta(yL: Double, yR: Double) -> Double {
         return yR-yL
     }
-    public final func sixth(j: Int, xL: Node, x: Node, xR: Node) -> Double? {
+     final func sixth(j: Int, xL: Node, x: Node, xR: Node) -> Double? {
         guard let y = detailed[j]?[x],
               let yL = detailed[j]?[xL],
               let yR = detailed[j]?[xR]
         else { return nil }
         return sixth(yL: yL, y: y, yR: yR)
     }
-    public final func sixth(yL: Double, y: Double, yR: Double) -> Double {
+     final func sixth(yL: Double, y: Double, yR: Double) -> Double {
         return 6.0*(y-0.5*(yR+yL))
     }
-    public final func xi(x: Double, xL: Node) -> Double {
+     final func xi(x: Double, xL: Node) -> Double {
         return (x-xL.value)/space.step
     }
-    public final func Nf(j: Int, x: Double, xL: Node, xM: Node, xR: Node) -> Double? {
+     final func Nf(j: Int, x: Double, xL: Node, xM: Node, xR: Node) -> Double? {
         guard let y = detailed[j]?[xM],
               let yL = detailed[j]?[xL],
               let yR = detailed[j]?[xR]
@@ -235,7 +236,7 @@ extension InterpolatedAdvection1D {
         let sixth = 6.0*(y-0.5*(yR+yL))
         return yL+xi*(delta+sixth*(1.0-xi))
     }
-    public final func Nf(x: Double, xL: Node, yL: Double, y: Double, yR: Double) -> Double {
+     final func Nf(x: Double, xL: Node, yL: Double, y: Double, yR: Double) -> Double {
         let xi = xi(x: x, xL: xL)
         let delta = delta(yL: yL, yR: yR)
         let sixth = sixth(yL: yL, y: y, yR: yR)

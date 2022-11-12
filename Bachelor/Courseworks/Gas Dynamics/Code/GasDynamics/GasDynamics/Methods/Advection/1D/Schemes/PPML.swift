@@ -8,12 +8,12 @@
 import Foundation
 
 extension Advection1D {
-    public final class PPML: InterpolatedAdvection1D {
-        public override var identifier: String? {
+     final class PPML: InterpolatedAdvection1D {
+         override var identifier: String? {
             return "advectionPPML"
         }
         
-        public override func solve(for j: Int) {
+         override func solve(for j: Int) {
             super.solve(for: j)
             guard detailed[j] != nil, detailed[j-1] != nil else { return }
             space.nodes().forEach { node in
