@@ -1,6 +1,6 @@
 \documentclass[12pt,a4paper]{article} 
 
-\usepackage{../../fn2kursstyle}
+\usepackage{fn2kursstyle}
 \usepackage[russian]{babel}
 \usepackage[T2A]{fontenc} 
 \usepackage[utf8]{inputenc} 
@@ -28,7 +28,7 @@
 \newcommand{\dhalf}{\dfrac{1}{2}}
 \newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}
 
-\title{Лабораторная работа №1 по дисциплине "Разработка программных комплексов" на тему "Методы конечных элементов"}
+\title{Лабораторная работа №1 по дисциплине "Разработка программных комплексов" на тему "Проекционные методы"}
 \group{ФН2-72Б}
 \author{Токарев А.\,И.}
 \supervisor{Азметов Х.\,Х.}
@@ -255,6 +255,10 @@
         \includegraphics[width=0.5\textwidth]{6_error.pdf}
         \caption{График ошибок}
     \end{figure}
+
+    \section{Выводы}
+
+    Рассмотренные проекционные методы дают достаточно высокую точность. Наилучшую точность дает метод Бубнова-Галеркина. В среднем, для получения относительной ошибки $10^{-4}-10^{-3}$ требуется взять 3 слагаемых в разложении по базисным функциям.
 
 \end{document}
 
