@@ -14,6 +14,7 @@
 \usepackage{siunitx}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
+\usepackage{dblfloatfix}
 
 \counterwithout{equation}{section}
 \counterwithout{figure}{section}
@@ -466,11 +467,12 @@
     \nu^+ = \dfrac{E^-}{2\mu^-} - 1, \quad \nu^- = \dfrac{E^+}{2\mu^+} - 1.
  \end{gather*}
 
- Для $\alpha$-Fe эти величины равны соответственно:
+ \pagebreak
 
- \begin{table}
+ Для $\alpha$-Fe эти величины равны соответственно:
+ \begin{table}[h!]
     \centering
-    \begin{tabular}[htb!]{|c|c|c|c|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|}
         \hline 
         $\lambda^-$ & $\lambda^+$ & $\mu^-$ & $\mu^+$ & $E^-$ & $E^+$ & $\nu^-$ & $\nu^+$ \\
         \hline 
@@ -492,10 +494,10 @@
     \nu^+ = \dfrac{E^-}{2\mu^-} - 1, \quad \nu^- = \dfrac{E^+}{2\mu^+} - 1.
  \end{gather*}
 
- Для Cd эти величины равны соответственно:
- \begin{table}
+ Для Cd эти величины равны соответственно: 
+ \begin{table}[h!]
     \centering
-    \begin{tabular}[htb!]{|c|c|c|c|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|}
         \hline 
         $\lambda^-$ & $\lambda^+$ & $\mu^-$ & $\mu^+$ & $E^-$ & $E^+$ & $\nu^-$ & $\nu^+$ \\
         \hline 
@@ -507,6 +509,59 @@
  \end{table}
 
  \pagebreak
+
+ \section{Задача Эшелби}
+
+ Для оценки характеристик поликристаллического материала можно использо-
+вать решение задачи Эшелби о взаимодействии с изотропной линейно-упругой сплошной средой изотропного линейно-упругого сферического или эллипсоидального включения. Для это необходимо решить систему уравнений:
+\begin{equation}
+    \begin{cases}
+        \zeta_{kkmm} = 0, \\
+        \zeta_{kmkm} = 0,
+    \end{cases}  
+    \label{eq:zeta}
+\end{equation}
+
+\noindent где 
+\begin{gather*}
+    \begin{split}
+        \zeta_{ijmn} &= \dfrac{C_{rsmn}^0 - C_{rsmn}}{C_{ijrs} - C_{ijpq}^0 (I_{pqrs} - w_{pqrs})}, \\[0.7em]
+        I_{ijkl} &= \dfrac{1}{2}(\delta_{ik} \delta_{jl} + \delta_{il} \delta_{jk}), \\[0.7em]
+        w_{ijkl} &= \dfrac{\chi + \frac{4 \mu}{3}}{2(\chi + 2\mu)} \Bigl(\dfrac{4 \mu - 3\chi}{3 \chi} \delta_{ij} \delta_{kl} + 5 I_{ijkl} \Bigr), \\[0.7em]
+        C^0_{11} &= \chi + \dfrac{4 \mu}{3}, \quad C^0_{12} = \chi - \dfrac{2\mu}{3}, \quad C^0_{44} = \mu.
+    \end{split}
+\end{gather*}
+
+Необходимо представить тензор (\refeq{eq:zeta}) в виде матрицы:
+\[
+    \begin{cases}
+        \zeta_{kkmm} = \zeta_{11} + \zeta_{22} + \zeta_{33} + 2(\zeta_{12} + \zeta_{13} + \zeta_{23}), \\
+        \zeta_{kmkm} = \zeta_{11} + \zeta_{22} + \zeta_{33} + 2(\zeta_{44} + \zeta_{55} + \zeta_{66}),
+    \end{cases}  
+\]
+
+\noindent чтобы найти его компоненты путем решения задачи минимизации:
+\begin{equation}
+    \zeta^2_{kkmm}(\chi, \mu) + \zeta^2_{kmkm}(\chi, \mu) \rightarrow \min.
+    \label{eq:min}    
+\end{equation}
+
+\pagebreak
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline 
+        Металл & $ \lambda^{min}$ & $\mu^{min}$ & $E^{min}$ & $\nu^{min}$ \\
+        \hline 
+        Fe & $168$ & $83.43$ & $214.8$ & $0.287$ \\
+        \hline
+        Cd & $168$ & $83.43$ & $214.8$ & $0.287$ \\
+        \hline 
+    \end{tabular}
+    \vspace{3mm}
+    \caption{Оценка параметров Ламе, модуля упругости и коэффициента Пуассона для железа –- задача Эшелби}
+ \end{table}
 
 \begin{thebibliography}{6}
 \bibitem{zarkuv}	Зарубин В.С. Математические модели механики и электродинамики сплошной среды. [Текст]/ В.С. Зарубин, Г.Н. Кувыркин -- Москва: Издательство МГТУ им. Н.Э. Баумана, 2008. -- 512~с.
