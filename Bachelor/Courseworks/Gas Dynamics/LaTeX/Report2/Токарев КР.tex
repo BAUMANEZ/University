@@ -104,7 +104,7 @@
                 \end{pmatrix}, \quad
                 \Lambda = (
                     u - c,\, u,\, u + c
-                )^T, \\[0.9em]
+                )^T, \\
                 R = \begin{pmatrix}
                     1 & 1 & 1 \\[2mm]
                     -\dfrac{c}{\rho} & 0 & \dfrac{c}{\rho} \\[4mm]
@@ -239,7 +239,7 @@
     В соответствии с формулой (\refeq{system:2d}) можно записать численную схему следующего вида:
     \begin{equation}
         \label{system:difference}
-        \bold u^{n + 1}_{i, j} = \bold u^{n}_{i, j} - \dfrac{\tau}{\Delta x} \Bigl( \bold F^{n + \half}_{i + \half, j} - \bold F^{n + \half}_{i - \half, j} \Bigr) - \dfrac{\tau}{\Delta y} \Bigl( \bold G^{n + \half}_{i, j + \half} - \bold G^{n + \half}_{i, j - \half} \Bigr),
+        \bold v^{n + 1}_{i, j} = \bold v^{n}_{i, j} - \dfrac{\tau}{\Delta x} \Bigl( \bold F^{n + \half}_{i + \half, j} - \bold F^{n + \half}_{i - \half, j} \Bigr) - \dfrac{\tau}{\Delta y} \Bigl( \bold G^{n + \half}_{i, j + \half} - \bold G^{n + \half}_{i, j - \half} \Bigr),
     \end{equation}
     \noindent где полуцелые пространственные индексы указывают, к какой границе ячейки они относятся, а временные -- усредненное значение потоков за шаг $ \tau $.
 
@@ -247,7 +247,7 @@
 
     Так как PPML -- модификация кусочно-параболического метода (PPM), то и подходы к построению решения у них в некотором смысле идентичны. Например, парабола внутри каждой разностной ячейки строится с использованием физических переменных (\refeq{var1d:phys}, \refeq{var2d:phys}).
 
-    \subsection{Вычисление граничных значений кусочных парабол}
+    \subsection{Граничные значения кусочных парабол}
 
     Для простоты далее будем рассматривать одномерную систему (\refeq{system:1d}). Для этого в разностной схеме (\refeq{system:difference}) достаточно обнулить последнее слагаемое и использовать один пространственный индекс -- $ i $. 
 
@@ -260,9 +260,10 @@
     \]
 
     Разложим вектор $ \bold v $ по собственным векторам $ \bold r^p \colon$
-    \[
+    \begin{equation}
+        \label{eq:eigen}
         \bold v = \sum_p \alpha^p \bold r^p,
-    \]
+    \end{equation}
     \noindent откуда получаем
     \begin{equation}
         \label{system:eigen}
@@ -275,6 +276,7 @@
     \]
     \noindent то есть каждое из уравнений (\refeq{system:eigen}) является инвариантом Римана. Его значение на границах разностной ячейки определяется в момент времени $t + \tau$ определяется через его значение в момент времени $t\colon$
     \begin{equation}
+        \label{shift:1d}
         \alpha^p(x_{i \pm \half}, t + \tau) = \alpha^p(x_{i \pm \half} - \lambda^p \tau, t).
     \end{equation}
 
@@ -316,7 +318,122 @@
         \rho^* = \sqrt{\rho^L \rho^R}, \quad \xi^* = \dfrac{\sqrt{\rho^L} \xi^L + \sqrt{\rho^R} \xi^R}{\sqrt{\rho^L} + \sqrt{\rho^R}}, \quad \xi = u,\,\, \dfrac{e + P}{\rho}.
     \]
 
-    Что касается решения системы уравнений газовой динамики в двумерном случае, можно расщеплять ее  
+    Что касается решения системы уравнений газовой динамики в двумерном случае, можно расщеплять ее по пространственным переменным и решать две системы одномерных уравнений вдоль каждой оси координат. Однако при этом необходимо учесть дополнительное изменение величин в граничных точках за счет соответствующих потоков.
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{difference2d.pdf}
+        \caption{Двухмерная разностная схема}
+        \label{fig:difference2d}
+    \end{figure}
+
+    \pagebreak
+
+    Рассмотрим дополнительные изменения величин (\picref{fig:difference2d}). Например, при переходе из ячейки $(i, j)$ в ячейку $(i+1, j)$, что соответствует точке $1$. Изменение величин за счет потока вдоль $Oy$ при переходе к следующему временному слою можно рассматривать как источник и решить систему (\refeq{system:2d}) в направлении $x$, учитывая это слагаемое:
+    \[
+        \dpartial{\alpha^P}{t} + \lambda^P \dpartial{\alpha^P}{x} = D^p, \quad D^p = -l_x^p A_y^p \dpartial{\bold v^p}{y}.
+    \]
+
+    Значения компонент $ \l_x^p, A_y^p $ вычисляются по тому же состоянию, по которому фиксируется базис собственных векторов в ячейке: 
+    \begin{itemize}
+        \item $(i, j)$ –- для волн, распространяющихся вдоль характеристик с положительными собственными значениями;
+        \item $(i, j + 1)$ -- для волн, распространяющихся вдоль характеристик с отрицательными собственными значениями.
+    \end{itemize}
+
+    Отметим, что частные производные $\dpartial{\bold v^p}{x}, \dpartial{\bold v^p}{y}$ заменяются разностными аналогами: 
+    \[
+        \dpartial{\bold v^p}{x} = \dfrac{\bold v_{i+1, j}^p - \bold v_{i, j}^p}{\Delta x}, \quad \dpartial{\bold v^p}{y} = \dfrac{\bold v_{i, j + 1}^p - \bold v_{i, j}^p}{\Delta y}.  
+    \]
+
+    Коэффициенты $\alpha^p$ в случае двумерной системы выглядит следующим образом:
+    \begin{equation}
+        \label{shift:2d}
+        \alpha^p(x_{i + \half}, t + \tau) = \alpha^p(x_{i + \half} - \lambda^p \tau, t) + D^p \tau
+    \end{equation}
+
+    Левые и правые состояния $\bold v_L, \bold v_R$ в точке $1$, а также граничное состояние $ \bold v_{i + \half, j} $ вычисляются так же, как и в одномерном случае.
+
+    Состояние в точке 2 рассчитывается аналогично, но за счет потока вдоль оси $x$.
+
+    \subsection{Потоки на границах разностных ячеек}
+
+    На состояние в точке, из которой происходит снос по характеристикам на предыдущий временной слой, влияет только интервал от точки пересечения характеристики с кусочной параболой на предыдущем слое до самой точки, т.е. либо $ [x_{i + \half} - \lambda_{\text{pos}} \tau,\, x_{i + \half}] $, либо $[x_{i + \half},\, x_{i + \half} - \lambda_{\text{neg}} \tau] $, обе эти ситуации изображены на \picref{fig:influence}. 
+
+    \pagebreak
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{influence.pdf}
+        \caption{Набор характеристик внутри разностной ячейки}
+        \label{fig:influence}
+    \end{figure}
+
+    Для получение второго порядка аппроксимации по времени нужно усреднить амплитуды $ \alpha^p(x,t) $, отвечающей каждой характеристике, по своей зоне влияния. Пусть внутри ячейки $i$ распространяется вдоль волны с $\lambda^p > 0$, тогда ее усредненная амплитуда будет вычисляться по формуле:
+    \[
+        \overline{\alpha}^p_{i + \half} = \dfrac{1}{\lambda^p \tau} \int \limits_{x_{i + \half} - \lambda^p \tau}^{x_{i + \half}} \alpha^p (x) dx, \quad \lambda^p > 0,
+    \]
+    \noindent и если учесть, что 
+    \[
+      \bold v_{i + \half}^{L, p} = \alpha^p (x) r^p \Rightarrow \alpha^p (x) = l^p \bold v_{i + \half}^{L, p},
+    \]
+    \noindent получаем
+    \[
+        \overline{\alpha}^p_{i + \half} = \dfrac{1}{\lambda^p \tau} \int \limits_{x_{i + \half} - \lambda^p \tau}^{x_{i + \half}} l^p \bold v_{i + \half}^{L, p} (x) dx.
+    \]
+
+    Базис собственных векторов фиксирован в каждой точке, поэтому его можно вынести из-под знака интеграла, а значит 
+    \[
+        \overline{\alpha}^p_{i + \half} = l^p \dfrac{1}{\lambda^p \tau} \int \limits_{x_{i + \half} - \lambda^p \tau}^{x_{i + \half}} \bold v_{i + \half}^{L, p} (x) dx = l^p \, \overline{\bold v}_{i + \half}^{L, p},
+    \]
+    \noindent где $ \overline{\bold v}_{i + \half}^{L, p} $ -- фиксированное состояние, по которому будет выбираться базис собственных векторов. Все характеристики в ячейке $ i $ с отрицательными собственными значениями (в ячейке $i + 1$ -- с положительными собственными значениями) не влияют на состояние в точке $1$. Тогда $\overline{\alpha}^p_{i + \half}$ при $\lambda_p < 0$ ($\lambda_p > 0$) можно либо приравнять к $0$, либо записать через систему:
+    \[
+        \begin{cases}
+            l^p \Bigl(\overline{\bold v}_{i + \half}^{L, 1}\Bigr) \cdot \overline{\bold v}_{i + \half}^{L, p}, & \lambda^p > 0, \\
+            l^p \Bigl(\overline{\bold v}_{i + \half}^{L, 1}\Bigr) \cdot \overline{\bold v}_{i + \half}^{L, 1}, & \lambda^p < 0.
+        \end{cases}
+    \]
+
+    Таким образом, состояние слева от границы $ \bold v_{i + \half} $ получается путем суммирования амплитуд по формуле (\refeq{eq:eigen}), однако удобнее использовать формулу для приращения вектора состояния по базису правых собственных векторов:
+    \[
+        \overline{\alpha}^p_{i + \half} = \Theta (\lambda^p) l^p \Bigl(\overline{\bold v}_{i + \half}^{L, p}\Bigr) + (1 - \Theta(\lambda^p))l^p \Bigl(\overline{\bold v}_{i + \half}^{L, 1}\Bigr),
+    \]
+    и если домножить это выражение слева на $r^p$, получим
+    \begin{equation}
+        \label{value:l}
+        \bold v^L_{i + \half} - \overline{\bold v}_{i + \half}^{L, 1} = \sum_{p^+} r^p \Bigl( l^p \Bigl( \overline{\bold v}_{i + \half}^{L, p} - \overline{\bold v}_{i + \half}^{L, 1} \Bigr) \Bigr)
+    \end{equation}
+        
+    Те же рассуждения применимы и для состояния справа от границы $\bold v^R_{i + \half} \colon$
+    \begin{equation}
+        \label{value:r}
+        \overline{\bold v}_{i + \half}^{R, 1} - \bold v^R_{i + \half} = \sum_{p^-} r^p \Bigl( l^p \Bigl( \overline{\bold v}_{i + \half}^{R, p} - \overline{\bold v}_{i + \half}^{R, 1} \Bigr) \Bigr)
+    \end{equation}
+
+    Формулы (\refeq{value:l}, \refeq{value:r}) показывают, что приращение каждой физической переменной в окрестности границы складывается из соответствующих приращений этих величин при пересечении каждой характеристики слева направо от одного состояния к другому.
+
+    В конце концов, определим поток $\bold F^{n + \half}_{i + \half}$ на правой границе, воспользовавшись методом Роу. Необходимо обратно перейти к консервативным переменным $\bold u$, затем вычислить $\bold F^L =\bold F(\bold u^L_{i + \half}),\, \bold F^R = \bold F(\bold u^R_{i + \half})$ -- потоки с обеих сторон, после чего воспользоваться формулой:
+    \[
+        \bold F^{n + \half}_{i + \half} = \dfrac{\bold F_L + \bold F_R}{2} - \dhalf \sum_p |\lambda^p (\bold v^*)| \Delta \alpha^p_{i + \half} r_{\bold u}^p (\bold u^*), \quad \Delta \alpha^p_{i + \half} = l^p (\bold v^*) \Bigl( \bold v^R_{i + \half} - \bold v^L_{i + \half} \Bigr),
+    \]
+
+    \pagebreak 
+
+    \noindent где $r_{\bold u}^p$ -- правый собственный вектор консервативной системы газовой динамики.
+
+    \section{Тестирование}
+
+    \begin{center}
+        *** В ПРОЦЕССЕ ****
+    \end{center}
+    \begin{center}
+        *** В ПРОЦЕССЕ ****
+    \end{center}
+    \begin{center}
+        *** В ПРОЦЕССЕ ****
+    \end{center}
+    \begin{center}
+        *** В ПРОЦЕССЕ ****
+    \end{center}
 
     \section-{Заключение}
 
