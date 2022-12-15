@@ -28,10 +28,15 @@ extension Gas1D {
             T: 0.4,
             N: 100,
             initial: { x in
-                if x <= 0 {
+                switch x {
+                case -1 ... 0:
                     return V(density: 1, speed: 0, pressure: 1)
-                } else {
+                    
+                case 0 ... 1:
                     return V(density: 0.125, speed: 0, pressure: 0.1)
+                    
+                default:
+                    return .zero
                 }
             }
         )
@@ -43,10 +48,15 @@ extension Gas1D {
             T: 0.32,
             N: 100,
             initial: { x in
-                if x <= 0 {
+                switch x {
+                case -1 ... 0:
                     return V(density: 0.445, speed: 0.698, pressure: 3.528)
-                } else {
+                    
+                case 0 ... 1:
                     return V(density: 0.5, speed: 0, pressure: 0.571)
+                    
+                default:
+                    return .zero
                 }
             }
         )
@@ -58,10 +68,15 @@ extension Gas1D {
             T: 0.36,
             N: 100,
             initial: { x in
-                if x <= -0.8 {
+                switch x {
+                case -1 ... -0.8:
                     return V(density: 3.857143, speed: 2.629369, pressure: 10.3333)
-                } else {
+                    
+                case -0.8 ... 1:
                     return V(density: 1 + 0.2 * sin(5 * .pi * x), speed: 0, pressure: 1)
+                    
+                default:
+                    return .zero
                 }
             }
         )

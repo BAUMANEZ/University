@@ -60,4 +60,19 @@ struct Matrix: CustomStringConvertible,
     }
     
     // MARK: - Internal methods
+    
+    func row(at i: Int) -> [Double] {
+        let row = i * m
+        return Array(values[row ..< row + m ])
+    }
+    
+    func col(at j: Int) -> [Double] {
+        var result = [Double](repeating: 0, count: n)
+        
+        for i in 0 ..< n {
+            result[i] = self[i, j]
+        }
+        
+        return result
+    }
 }

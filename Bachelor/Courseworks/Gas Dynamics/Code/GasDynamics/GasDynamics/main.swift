@@ -7,4 +7,4 @@
 
 import Foundation
 
-Gas1D(test: Gas1D.Tests.sod)
+//Gas1D(test: Gas1D.Tests.sod)

@@ -27,6 +27,22 @@ final class Gas1D: JSONConvertableAlgorithm {
             return Gas1D.V(density: alpha * e1, speed: alpha * e2, pressure: alpha * e3)
         }
         
+        static func *(l: [Double], v: V) -> Double {
+            return l[0] * v.density + l[1] * v.speed + l[2] * v.pressure
+        }
+        
+        static func *(v: V, r: [Double]) -> Double {
+            return r * v
+        }
+        
+        static func +(v1: V, v2: V) -> V {
+            return V(density: v1.density + v2.density, speed: v1.speed + v2.speed, pressure: v1.pressure + v2.pressure)
+        }
+        
+        static func /(v: V, x: Double) -> V {
+            return V(density: v.density / x, speed: v.speed / x, pressure: v.pressure / x)
+        }
+        
         // MARK: - Internal properties
         
         let density : Double
@@ -75,6 +91,10 @@ final class Gas1D: JSONConvertableAlgorithm {
         /// - (E + p) * u
         let f3: Double
         
+        public init(physical v: V, gamma: Double = Constants.gamma) {
+            self.init(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
+        }
+        
         public init(density: Double, speed: Double, pressure: Double, gamma: Double = Constants.gamma) {
             f1 = density*speed
             f2 = density*pow(speed, 2) + pressure
@@ -109,24 +129,85 @@ final class Gas1D: JSONConvertableAlgorithm {
     func solve() {
         var t: Double = 0
         
-        solution[t] = space.nodes().reduce(into: Mesh()) { mesh, x in
-            mesh[BoundaryValue(value: x, side: .middle)] = v0(x)
+        solution[t] = space.nodes().reduce(into: Mesh()) { mesh, _x in
+            let xL = BoundaryValue(value: _x - space.halfed, side: .right)
+            let x  = BoundaryValue(value: _x, side: .middle)
+            let xR = BoundaryValue(value: _x + space.halfed, side: .left)
+            let vL = v0(xL.value)
+            let vR = v0(xR.value)
+            let v  = (vL + vR) / 2.0
+
+            mesh[xL] = vL
+            mesh[x]  = v
+            mesh[xR] = vR
         }
         
         while t <= T {
             guard let meshP = solution[t] else { assertionFailure("Time iteration error"); return }
             
-            let tau = self.tau(average: Set(meshP.values))
+            let tau = self.tau(average: Set(meshP.filter{ $0.key.side == .middle }.values))
+            let tP = t
+            t += tau
+            solution[t] = [:]
             
+            space.nodes().forEach { node in
+                let x = BoundaryValue(value: node, side: .middle)
+                let xL = BoundaryValue(value: node - space.halfed, side: .right)
+                let xR = BoundaryValue(value: node + space.halfed, side: .left)
+                
+                
+            }
         }
     }
     
     // MARK: - Private methods
     
+    private func averageFlow(FL: F, FR: F, vStar: V, vR: V, vL: V) {
+        
+    }
+    
     private func tau(average vSet: Set<V>) -> Double {
         let maxLamba = vSet.map { abs($0.speed + Constants.speedOfSound(physical: $0, gamma: gamma)) }.max()!
         
         return Constants.sigmaGas * space.step / maxLamba
+    }
+        
+    private func Nv(
+        t: Double,
+        x: Double,
+        xL: BoundaryValue,
+        xM: BoundaryValue,
+        xR: BoundaryValue
+    ) -> V {
+        guard
+            let vL = solution[t]?[xL],
+            let vM  = solution[t]?[xM],
+            let vR = solution[t]?[xR]
+        else { return .zero }
+        
+        return V(
+            density: Nv(x: x, xL: xL.value, vL: vL.density, vM: vM.density, vR: vR.density),
+            speed: Nv(x: x, xL: xL.value, vL: vL.speed, vM: vM.speed, vR: vR.speed),
+            pressure: Nv(x: x, xL: xL.value, vL: vL.pressure, vM: vM.pressure, vR: vR.pressure)
+        )
+    }
+    
+    private func Nv(
+        x: Double,
+        xL: Double,
+        vL: Double,
+        vM: Double,
+        vR: Double
+    ) -> Double {
+        let xi = (x - xL) / space.step
+        let delta = vR - vL
+        let sixth = 6.0 * (vM - 0.5 * (vR + vL))
+        
+        return vL + xi * (delta + sixth * (1.0 - xi))
+    }
+    
+    private func shifted(x: Double, lambda: Double, tau: Double) -> Double {
+        return x - lambda * tau
     }
 }
 
@@ -171,49 +252,41 @@ extension Gas1D {
             return Lambda(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
         }
         
-        static func R(density: Double, speed: Double, pressure: Double, gamma: Double = Constants.gamma) -> Matrix {
+        static func R(
+            density: Double,
+            speed: Double,
+            pressure: Double,
+            gamma: Double = Constants.gamma
+        ) -> [[Double]] {
             let c = Constants.speedOfSound(density: density, pressure: pressure, gamma: gamma)
-            var result = Matrix(n: 3, initial: 0.0)
             
-            result[0, 0] = 1
-            result[0, 1] = 1
-            result[0, 2] = 1
-            
-            result[1, 0] = -c / density
-            result[1, 1] = 0
-            result[1, 2] = c / density
-            
-            result[2, 0] = c * c
-            result[2, 1] = 0
-            result[2, 2] = c * c
-            
-            return result
+            return [
+                [1, -c / density, c * c],
+                [1, 0, 0],
+                [1, c / density, c * c]
+            ]
         }
         
-        static func R(physical v: V, gamma: Double = Constants.gamma) -> Matrix {
+        static func R(physical v: V, gamma: Double = Constants.gamma) -> [[Double]] {
             return R(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
         }
         
-        static func L(density: Double, speed: Double, pressure: Double, gamma: Double = Constants.gamma) -> Matrix {
+        static func L(
+            density: Double,
+            speed: Double,
+            pressure: Double,
+            gamma: Double = Constants.gamma
+        ) -> [[Double]] {
             let c = Constants.speedOfSound(density: density, pressure: pressure, gamma: gamma)
-            var result = Matrix(n: 3, initial: 0.0)
             
-            result[0, 0] = 0
-            result[0, 1] = -density / (2 * c)
-            result[0, 2] = 1 / (2 * c * c)
-            
-            result[1, 0] = 1
-            result[1, 1] = 0
-            result[1, 2] = -1 / (c * c)
-            
-            result[2, 0] = 0
-            result[2, 1] = density / (2 * c)
-            result[2, 2] = 1 / (2 * c * c)
-            
-            return result
+            return [
+                [0, -density / (2 * c), 1 / (2 * c * c)],
+                [1, 0, -1 / (c * c)],
+                [0, density / (2 * c), 1 / (2 * c * c)]
+            ]
         }
         
-        static func L(physical v: V, gamma: Double = Constants.gamma) -> Matrix {
+        static func L(physical v: V, gamma: Double = Constants.gamma) -> [[Double]] {
             return L(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
         }
     }
