@@ -9,8 +9,7 @@ import Foundation
 
 
 struct Matrix: CustomStringConvertible,
-               CustomDebugStringConvertible
-{
+               CustomDebugStringConvertible {
     // MARK: - Internal properties
     
     fileprivate(set) var n: Int
@@ -61,21 +60,4 @@ struct Matrix: CustomStringConvertible,
     }
     
     // MARK: - Internal methods
-}
-
-extension Matrix {
-    
-    // MARK: - R_x in 1-D
-    static func R1D(density: Double, pressure: Double, gamma: Double) -> Matrix {
-        var result = Matrix(n: 3, initial: 0.0)
-        
-        return result
-    }
-    
-    // MARK: - L_x in 1-D
-    static func L1D(density: Double, pressure: Double, gamma: Double) -> Matrix {
-        var result = Matrix(n: 3, initial: 0.0)
-        
-        return result
-    }
 }

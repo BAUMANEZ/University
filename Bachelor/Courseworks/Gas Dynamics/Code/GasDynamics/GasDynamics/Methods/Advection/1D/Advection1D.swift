@@ -53,9 +53,10 @@ import Foundation
         return drift(for: t, in: x)
     }
      override func solve() {
-        let solutions = time.nodes(starting: 1).reduce(into: [Time: Mesh]()) { solutions, t in
+        let solutions = time.nodes(starting: 1).reduce(into: Solution()) { solutions, t in
             solutions[t] = space.nodes().reduce(into: Mesh()) { mesh, x in
-                mesh[x] = f(x: x, t: t)
+                let x = BoundaryValue(value: x, side: .middle)
+                mesh[x] = f(x: x.value, t: t)
             }
         }
         save(file: "advection", data: data(for: solutions))

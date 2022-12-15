@@ -7,21 +7,10 @@
 
 import Foundation
 
- class Algorithm {
-     let time: Grid
-    
-     var data: Data? {
-        return nil
-    }
-    
-     init(tau: Double = 1.0, deadline: Double) {
-        self.time = Grid(start: 0, end: deadline, step: tau)
-        solve()
-    }
-    
-     func solve() {}
-    
-     final func save(file name: String, data: Data?, meta: Data? = nil) {
+protocol JSONConvertableAlgorithm {}
+
+extension JSONConvertableAlgorithm {
+    func save(file name: String, data: Data?, meta: Data? = nil) {
         let manager = FileManager.default
         let folder = manager.homeDirectoryForCurrentUser
             .appendingPathComponent("Desktop", isDirectory: true)
@@ -32,4 +21,20 @@ import Foundation
         manager.createFile(atPath: file.path, contents: data)
         manager.createFile(atPath: extra.path, contents: meta)
     }
+}
+
+class Algorithm: JSONConvertableAlgorithm {
+    
+    let time: Grid
+    
+    var data: Data? {
+        return nil
+    }
+    
+    init(tau: Double = 1.0, deadline: Double) {
+        self.time = Grid(start: 0, end: deadline, step: tau)
+        solve()
+    }
+    
+    func solve() {}
 }

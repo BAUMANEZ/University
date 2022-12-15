@@ -8,36 +8,45 @@
 import Foundation
 
 extension Advection1D {
-     final class PPML: InterpolatedAdvection1D {
-         override var identifier: String? {
+    final class PPML: InterpolatedAdvection1D {
+        override var identifier: String? {
             return "advectionPPML"
         }
         
-         override func solve(for j: Int) {
+        override func solve(for j: Int) {
             super.solve(for: j)
-            guard detailed[j] != nil, detailed[j-1] != nil else { return }
+            
+            let t = time.node(for: j)
+            let jP = j - 1
+            let tP = time.node(for: jP)
+            
+            guard solution[t] != nil, solution[tP] != nil else { return }
+            
             space.nodes().forEach { node in
-                let x  = Node(value: node, side: .middle)
-                let xL = Node(value: node-space.halfed, side: .right)
-                let xR = Node(value: node+space.halfed, side: .left)
-                let xP  = Node(value: node-space.step, side: .middle)
-                let xLP = Node(value: node-space.step-space.halfed, side: .right)
-                let xRP = Node(value: node-space.halfed, side: .left)
-                guard let yL = Nf(j: j-1, x: xL.value-c*time.step, xL: xLP, xM: xP, xR: xRP),
-                      let yR = Nf(j: j-1, x: xR.value-c*time.step, xL: xL, xM: x, xR: xR),
-                      let y  = detailed[j]?[x]
-                else { return  }
+                let x  = BoundaryValue(value: node, side: .middle)
+                let xL = BoundaryValue(value: node-space.halfed, side: .right)
+                let xR = BoundaryValue(value: node+space.halfed, side: .left)
+                let xP  = BoundaryValue(value: node-space.step, side: .middle)
+                let xLP = BoundaryValue(value: node-space.step-space.halfed, side: .right)
+                let xRP = BoundaryValue(value: node-space.halfed, side: .left)
+                
+                guard let yL = Nf(t: tP, x: xL.value-c*time.step, xL: xLP, xM: xP, xR: xRP),
+                      let yR = Nf(t: tP, x: xR.value-c*time.step, xL: xL, xM: x, xR: xR),
+                      let y  = solution[t]?[x]
+                else { return }
+                
                 guard (yR-y)*(y-yL) > 0 else {
-                    detailed[j]?[xL] = y
-                    detailed[j]?[xR] = y
+                    solution[t]?[xL] = y
+                    solution[t]?[xR] = y
                     return
                 }
+                
                 let delta = delta(yL: yL, yR: yR)
                 let sixth = sixth(yL: yL, y: y, yR: yR)
                 let deltaSix = delta*sixth
                 let deltaSq = delta*delta
-                detailed[j]?[xL] = deltaSix > deltaSq ? (3.0*y-2.0*yR) : yL
-                detailed[j]?[xR] = deltaSix < -deltaSq ? (3.0*y-2.0*yL) : yR
+                solution[t]?[xL] = deltaSix > deltaSq ? (3.0*y-2.0*yR) : yL
+                solution[t]?[xR] = deltaSix < -deltaSq ? (3.0*y-2.0*yL) : yR
             }
         }
     }

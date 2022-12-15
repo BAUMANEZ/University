@@ -8,40 +8,46 @@
 import Foundation
 
 extension Advection1D {
-     final class PPM: InterpolatedAdvection1D {
-         override var identifier: String? {
+    final class PPM: InterpolatedAdvection1D {
+        override var identifier: String? {
             return "advectionPPM"
         }
         
-         override func solve(for j: Int) {
+        override func solve(for j: Int) {
             super.solve(for: j)
-            guard detailed[j] != nil else { return }
+            
+            let t = time.node(for: j)
+            
+            guard solution[t] != nil else { return }
+            
             space.nodes().forEach { node in
-                let x  = Node(value: node, side: .middle)
-                let xMM = Node(value: node-2.0*space.step, side: .middle)
-                let xM  = Node(value: node-space.step, side: .middle)
-                let xP  = Node(value: node+space.step, side: .middle)
-                let xPP = Node(value: node+2.0*space.step, side: .middle)
-                let yMM = detailed[j]?[xMM] ?? 0
-                let yM  = detailed[j]?[xM]  ?? 0
-                let y   = detailed[j]?[x]   ?? 0
-                let yP  = detailed[j]?[xP]  ?? 0
-                let yPP = detailed[j]?[xPP] ?? 0
-                let xL = Node(value: node-space.halfed, side: .right)
-                let xR = Node(value: node+space.halfed, side: .left)
-                let yL = 0.5*(yM+y)-(1.0/6.0)*(deltaM(yL: yM, y: y, yR: yP)-deltaM(yL: yMM, y: yM, yR: y))
-                let yR = 0.5*(y+yP)-(1.0/6.0)*(deltaM(yL: y, y: yP, yR: yPP)-deltaM(yL: yM, y: y, yR: yP))
+                let x   = BoundaryValue(value: node, side: .middle)
+                let xMM = BoundaryValue(value: node-2.0*space.step, side: .middle)
+                let xM  = BoundaryValue(value: node-space.step, side: .middle)
+                let xP  = BoundaryValue(value: node+space.step, side: .middle)
+                let xPP = BoundaryValue(value: node+2.0*space.step, side: .middle)
+                let yMM = solution[t]?[xMM] ?? 0
+                let yM  = solution[t]?[xM]  ?? 0
+                let y   = solution[t]?[x]   ?? 0
+                let yP  = solution[t]?[xP]  ?? 0
+                let yPP = solution[t]?[xPP] ?? 0
+                let xL  = BoundaryValue(value: node-space.halfed, side: .right)
+                let xR  = BoundaryValue(value: node+space.halfed, side: .left)
+                let yL  = 0.5*(yM+y)-(1.0/6.0)*(deltaM(yL: yM, y: y, yR: yP)-deltaM(yL: yMM, y: yM, yR: y))
+                let yR  = 0.5*(y+yP)-(1.0/6.0)*(deltaM(yL: y, y: yP, yR: yPP)-deltaM(yL: yM, y: y, yR: yP))
+                
                 guard (yR-y)*(y-yL) > 0 else {
-                    detailed[j]?[xL] = y
-                    detailed[j]?[xR] = y
+                    solution[t]?[xL] = y
+                    solution[t]?[xR] = y
                     return
                 }
+                
                 let delta = yR-yL
                 let sixth = 6.0*(y-0.5*(yL+yR))
                 let deltaSix = delta*sixth
                 let deltaSq = delta*delta
-                detailed[j]?[xL] = deltaSix > deltaSq ? (3.0*y-2.0*yR) : yL
-                detailed[j]?[xR] = deltaSix < -deltaSq ? (3.0*y-2.0*yL) : yR
+                solution[t]?[xL] = deltaSix > deltaSq ? (3.0*y-2.0*yR) : yL
+                solution[t]?[xR] = deltaSix < -deltaSq ? (3.0*y-2.0*yL) : yR
             }
         }
         
@@ -55,7 +61,7 @@ extension Advection1D {
     }
 }
 
- extension Double {
+extension Double {
     var sign: Double {
         return self >= .zero ? 1.0 : -1.0
     }
