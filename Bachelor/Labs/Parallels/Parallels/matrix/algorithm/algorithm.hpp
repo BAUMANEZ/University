@@ -11,13 +11,12 @@
 #include <iostream>
 #include <array>
 #include <functional>
-#include "omp.h"
 #include "../core/matrix.hpp"
 #include "../norms/norms.hpp"
 #include "../../grid/1d/grid1d.hpp"
 #include "../../helpers/helpers.hpp"
 
- struct algorithm final {
+struct algorithm final {
 //MARK: - LU
     static void lu_decomposition(matrix& A);
     static void blu_decomposition(matrix& A, const size_t block);

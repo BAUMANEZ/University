@@ -10,8 +10,7 @@
 
 #include <iostream>
 #include <math.h>
-#include <omp.h>
-// #include "../tests.h"
+#include "../../helpers/helpers.hpp"
 #include "../../matrix/algorithm/algorithm.hpp"
 
 struct test_helmholtz final {

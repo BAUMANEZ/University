@@ -5,13 +5,14 @@
 //  Created by Арсений Токарев on 14.10.2022.
 //
 
+#include <omp.h>
 #include "test_helmholtz.hpp"
 
 void test_helmholtz::run(bool paralleled) {
     std::cout << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n\n";
     omp_set_num_threads(paralleled ? 18 : 1);
 
-    for (size_t i = 1; i <= 4; ++i) {
+    for (size_t i = 1; i <= 2; ++i) {
         const size_t t = 320*i;
         const size_t n =  t*10;
         const double h = 1./double(n - 1);
@@ -44,7 +45,7 @@ void test_helmholtz::run(bool paralleled) {
         matrix copy_test(test);
 
         std::cout << "===========================";
-        std::cout << "\n"
+        std::cout << "\n";
 
         std::cout << "N=" << n << ", h=" << h << ", k=" << k << "\n\n";
 
