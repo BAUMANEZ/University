@@ -31,7 +31,7 @@ import Foundation
                 json[String(solution.key)] = mesh
             }
         }
-        return try? JSONSerialization.data(withJSONObject: json, options: [.sortedKeys, .prettyPrinted])
+        return try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted])
     }
     
      func f(x: Double, t: Double) -> Double? {

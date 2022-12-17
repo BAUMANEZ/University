@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct BoundaryValue: Hashable, Comparable {
+struct BoundaryValue: Hashable, Comparable, Encodable {
     
     //MARK: - Nested types
     
-    enum Side: Int, Hashable, Comparable {
+    enum Side: Int, Hashable, Comparable, Encodable {
         case left
         case middle
         case right

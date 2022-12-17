@@ -76,3 +76,23 @@ struct Matrix: CustomStringConvertible,
         return result
     }
 }
+
+extension Array where Element == Double {
+    static func *(left: Self, right: Self) -> Double {
+        var result: Double = 0
+        
+        for i in stride(from: 0, to: left.count, by: 1) {
+            result += left[i] * right[i]
+        }
+        
+        return result
+    }
+    
+    static func *(left: Self, right: Double) -> [Double] {
+        return left.map { $0 * right }
+    }
+    
+    static func *(left: Double, right: Self) -> [Double] {
+        return right * left
+    }
+}

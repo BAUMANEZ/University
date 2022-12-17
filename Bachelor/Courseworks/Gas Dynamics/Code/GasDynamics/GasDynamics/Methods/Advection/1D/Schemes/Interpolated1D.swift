@@ -207,8 +207,8 @@ class InterpolatedAdvection1D: Advection1D {
         
         space.nodes().forEach { node in
             let x  = BoundaryValue(value: node, side: .middle)
-            let xL = BoundaryValue(value: node-space.halfed, side: .right)
-            let xR = BoundaryValue(value: node+space.halfed, side: .left)
+            let xL = BoundaryValue(value: node - space.halfed, side: .right)
+            let xR = BoundaryValue(value: node + space.halfed, side: .left)
             
             guard let leftFlow = flow(t: tP, xB: xL),
                   let rightFlow = flow(t: tP, xB: xR),

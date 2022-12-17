@@ -57,7 +57,7 @@ final class Grid: Equatable {
     init(start: Double, end: Double, steps: Int) {
         self.start = start
         self.end = end
-        self.step = (end - start) / Double(steps - 1)
+        self.step = (end - start) / Double(steps)
         self.steps = steps
     }
     
