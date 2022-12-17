@@ -8,6 +8,8 @@
 #ifndef helpers_hpp
 #define helpers_hpp
 
+#include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -24,5 +26,7 @@ std::string cut(double number, size_t n);
 bool is_odd(size_t n);
 
 int number_of_digits(double num, int precision = 16);
+
+std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref);
 
 #endif /* helpers_hpp */

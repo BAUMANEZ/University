@@ -5,6 +5,7 @@
 //  Created by Арсений Токарев on 13.10.2022.
 //
 
+#include "omp.h"
 #include "algorithm.hpp"
 
 size_t algorithm::helmholtz_red_black(

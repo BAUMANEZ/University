@@ -5,9 +5,6 @@
 #SBATCH --partition=release
 ulimit -l unlimited
 
-icpc -O2 -fopenmp -o run main.cpp
-mpirun -np 1 /nethome/student/FS19/FS2-x2/Tokarev/Parallels/run
-
-icpc -fopenmp -o run main_helmholtz_omp.cpp  ./helpers/helpers.cpp ./grid/1d/grid1d.cpp ./matrix/core/matrix.cpp ./matrix/algorithm/algorithm_helmholtz_omp.cpp ./matrix/norms/norms.cpp ./tests/helmholtz/test_helmholtz_omp.cpp
+icpc -O2 -fopenmp -o run main_helmholtz_omp.cpp  ./helpers/helpers.cpp ./grid/1d/grid1d.cpp ./matrix/core/matrix.cpp ./matrix/algorithm/algorithm_helmholtz_omp.cpp ./matrix/norms/norms.cpp ./tests/helmholtz/test_helmholtz_omp.cpp
 mpirun -np 1 /nethome/student/FS19/FS2-x2/Tokarev/Parallels/run
 rm run

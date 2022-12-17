@@ -12,7 +12,7 @@ void test_helmholtz::run(bool paralleled) {
     std::cout << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n\n";
     omp_set_num_threads(paralleled ? 18 : 1);
 
-    for (size_t i = 1; i <= 2; ++i) {
+    for (size_t i = 1; i <= 1; ++i) {
         const size_t t = 320*i;
         const size_t n =  t*10;
         const double h = 1./double(n - 1);
@@ -59,16 +59,16 @@ void test_helmholtz::run(bool paralleled) {
 
         std::cout << "\n\n";
 
-        //MARK: Jacobi
-        std::cout << "***JACOBI***:\n";
-        start = omp_get_wtime();
-        size_t iterations_jacobi = algorithm::helmholtz_jacobi(copy_test, k, h, x, y, values);
-        std::cout << "Time=" << omp_get_wtime()-start << "\n";
-        std::cout << "Iterations=" << std::max(0, (int)iterations_jacobi-1) << ", ||frobenius||=" << norms::frobenius(copy_test, analytical);
-
-        std::cout << "\n";
-        std::cout << "===========================";
-        std::cout << "\n\n";
+//        //MARK: Jacobi
+//        std::cout << "***JACOBI***:\n";
+//        start = omp_get_wtime();
+//        size_t iterations_jacobi = algorithm::helmholtz_jacobi(copy_test, k, h, x, y, values);
+//        std::cout << "Time=" << omp_get_wtime()-start << "\n";
+//        std::cout << "Iterations=" << std::max(0, (int)iterations_jacobi-1) << ", ||frobenius||=" << norms::frobenius(copy_test, analytical);
+//
+//        std::cout << "\n";
+//        std::cout << "===========================";
+//        std::cout << "\n\n";
     }
 
     std::cout << "END OF " << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n";

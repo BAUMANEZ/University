@@ -52,3 +52,18 @@ int number_of_digits(double num, int precision) {
     no_of_digits=16-extrazeroes;
     return std::min(no_of_digits, precision);
 }
+
+std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
+    const int precision = 8;
+    out << "Vector, len=(" << ref.size() << "), adress=" << &ref << "\n";
+    if (!(ref.size() < 10)) {
+        return out;
+    }
+    int width = 1;
+    for (const auto& x: ref)
+        width = std::max(width, number_of_digits(x, precision));
+    for (const auto& x: ref)
+        out << std::left << std::setw(2) << "|" << std::right << std::setw(width) << x << std::setw(3) <<"|\n";
+    out << "\n";
+    return out;
+}

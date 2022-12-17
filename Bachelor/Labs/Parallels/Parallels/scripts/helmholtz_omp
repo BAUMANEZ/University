@@ -1,3 +1,3 @@
-icpc -diag-disable=10441 -fopenmp -o run main_helmholtz_omp.cpp  ./helpers/helpers.cpp ./grid/1d/grid1d.cpp ./matrix/core/matrix.cpp ./matrix/algorithm/algorithm_helmholtz_omp.cpp ./matrix/norms/norms.cpp ./tests/helmholtz/test_helmholtz_omp.cpp
+icpc -O2 -diag-disable=10441 -fopenmp -o run main_helmholtz_omp.cpp  ./helpers/helpers.cpp ./grid/1d/grid1d.cpp ./matrix/core/matrix.cpp ./matrix/algorithm/algorithm_helmholtz_omp.cpp ./matrix/norms/norms.cpp ./tests/helmholtz/test_helmholtz_omp.cpp
 ./run
 rm run
