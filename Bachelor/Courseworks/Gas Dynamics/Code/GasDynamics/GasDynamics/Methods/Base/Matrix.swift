@@ -10,14 +10,26 @@ import Foundation
 
 struct Matrix: CustomStringConvertible,
                CustomDebugStringConvertible {
-    // MARK: - Operator
+    // MARK: - Operators
     
     static func *(left: Matrix, right: [Double]) -> [Double] {
-        return (0 ..< left.m).reduce(into: [Double]()) { vector, i in
+        return (0 ..< left.n).reduce(into: [Double]()) { vector, i in
             var result: Double = 0
             
-            for j in stride(from: 0, to: right.count, by: 1) {
+            for j in stride(from: 0, to: left.m, by: 1) {
                 result += left[i, j] * right[j]
+            }
+            
+            vector.append(result)
+        }
+    }
+    
+    static func *(left: [Double], right: Matrix) -> [Double] {
+        return (0 ..< right.m).reduce(into: [Double]()) { vector, i in
+            var result: Double = 0
+            
+            for j in stride(from: 0, to: right.n, by: 1) {
+                result += left[j] * right[j, i]
             }
             
             vector.append(result)

@@ -291,7 +291,7 @@ final class Gas1D: JSONConvertableAlgorithm {
                     xRL: xNL, xRM: xN, xRR: xNR
                 )
                 
-                solution[t]?[x] = v - (rightFlow - leftFlow)
+                solution[t]?[x] = v - tau / space.step * (rightFlow - leftFlow)
             }
         }
     }
@@ -397,7 +397,7 @@ final class Gas1D: JSONConvertableAlgorithm {
         
         let flow = 0.5 * (fL + fR) - F(vector: sum)
         let invM = Eigen.InvM(physical: vStar, gamma: gamma)
-        let _flow = invM * (tau / space.step * flow).plain
+        let _flow = invM * flow.plain
         
         return V(vector: _flow)
     }
@@ -439,6 +439,8 @@ final class Gas1D: JSONConvertableAlgorithm {
         xRR: BoundaryValue
     ) -> V {
         return system.reduce(into: V.zero) { result, system in
+            guard system.lambda.magnitude > .ulpOfOne else { return () }
+            
             let shiftedX = shifted(x: xLR.value, lambda: system.lambda, tau: tau)
             
             if system.lambda > 0 {
@@ -476,6 +478,9 @@ final class Gas1D: JSONConvertableAlgorithm {
         xRM: BoundaryValue,
         xRR: BoundaryValue
     ) -> V {
+        
+        guard system.lambda.magnitude > .ulpOfOne else { return .zero }
+        
         let delta = system.lambda.magnitude * tau
         let shiftedX = shifted(x: xLR.value, lambda: system.lambda, tau: tau)
         
@@ -649,7 +654,7 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> Double {
-            return pressure / (gamma - 1) + 0.5 * density * pow(speed, 2)
+            return pressure / (gamma - 1) + 0.5 * density * speed * speed
         }
         
         static func energy(physical v: V, gamma: Double = Constants.gamma) -> Double {
@@ -662,7 +667,7 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> Double {
-            return (gamma / (gamma - 1) + density * speed * speed / 2) / density
+            return (pressure * gamma / (gamma - 1) + density * speed * speed / 2) / density
         }
         
         static func enthalpy(physical v: V, gamma: Double = Constants.gamma) -> Double {
@@ -843,7 +848,7 @@ extension Gas1D {
                 
                 let delta = delta(vL: vL, vR: vR)
                 let sixth = sixth(vL: vL, vM: v, vR: vR)
-                let step = space.step / 1
+                let step = space.step / 5
                 for k in stride(from: xL.value + step, to: xR.value, by: step) {
                     let xi = xi(x: k, xL: xL.value)
                     let vK = Nv(x: k, vL: vL, xi: xi, delta: delta, sixth: sixth)
