@@ -10,6 +10,20 @@ import Foundation
 
 struct Matrix: CustomStringConvertible,
                CustomDebugStringConvertible {
+    // MARK: - Operator
+    
+    static func *(left: Matrix, right: [Double]) -> [Double] {
+        return (0 ..< left.m).reduce(into: [Double]()) { vector, i in
+            var result: Double = 0
+            
+            for j in stride(from: 0, to: right.count, by: 1) {
+                result += left[i, j] * right[j]
+            }
+            
+            vector.append(result)
+        }
+    }
+    
     // MARK: - Internal properties
     
     fileprivate(set) var n: Int
@@ -94,5 +108,29 @@ extension Array where Element == Double {
     
     static func *(left: Double, right: Self) -> [Double] {
         return right * left
+    }
+    
+    static func +=(left: inout Self, right: Self) {
+        right.enumerated().forEach { left[$0.offset] += $0.element }
+    }
+    
+    static func +(left: Self, right: Self) -> Self {
+        var result = Array(repeating: 0, count: left.count)
+        
+        left.indices.forEach { i in
+            result[i] = left[i] + right[i]
+        }
+        
+        return result
+    }
+    
+    static func -(left: Self, right: Self) -> Self {
+        var result = Array(repeating: 0, count: left.count)
+        
+        left.indices.forEach { i in
+            result[i] = left[i] - right[i]
+        }
+        
+        return result
     }
 }
