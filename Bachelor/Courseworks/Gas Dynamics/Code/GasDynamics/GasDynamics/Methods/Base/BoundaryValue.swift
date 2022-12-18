@@ -7,11 +7,15 @@
 
 import Foundation
 
-struct BoundaryValue: Hashable, Comparable, Encodable {
+struct BoundaryValue: Hashable, Comparable {
+    
+    // MARK: - Type properties
+    
+    static let zero = BoundaryValue(value: .zero, side: .middle)
     
     //MARK: - Nested types
     
-    enum Side: Int, Hashable, Comparable, Encodable {
+    enum Side: Int, Hashable, Comparable {
         case left
         case middle
         case right
@@ -38,11 +42,27 @@ struct BoundaryValue: Hashable, Comparable, Encodable {
         return lhs.value < rhs.value
     }
     static func == (lhs: BoundaryValue, rhs: BoundaryValue) -> Bool {
-        return lhs.side == rhs.side && Swift.abs(lhs.value-rhs.value) < Double.leastNormalMagnitude
+        return lhs.side == rhs.side && Swift.abs(lhs.value-rhs.value) < .ulpOfOne
     }
     
     //MARK: - Properties
     
     let value: Double
     let side: Side
+}
+
+extension Dictionary where Key == BoundaryValue {
+    
+    subscript(safe key: BoundaryValue) -> Value? {
+        get {
+            guard let key = self.first(where: { $0.key == key })?.key else { return nil }
+            
+            return self[key]
+        }
+        set {
+            guard let key = self.first(where: { $0.key == key })?.key else { return }
+            
+            self[key] = newValue
+        }
+    }
 }
