@@ -268,7 +268,7 @@ final class Gas1D: JSONConvertableAlgorithm {
             mesh[xR] = vR
         }
         
-        while t < 0.016 {
+        while t < T {
             guard let meshP = solution[t] else { assertionFailure("Time iteration error"); return }
             
             let tau = tau(average: Set(meshP.filter{ $0.key.side == .middle}.values))
@@ -288,6 +288,8 @@ final class Gas1D: JSONConvertableAlgorithm {
                 
                 solution[t]?[x] = newV
             }
+            
+            return
         }
     }
     
@@ -320,14 +322,15 @@ final class Gas1D: JSONConvertableAlgorithm {
         let xNL = BoundaryValue(value: node + space.step - space.halfed, side: .right)
         let xN = BoundaryValue(value: node + space.step, side: .middle)
         let xNR = BoundaryValue(value: node + space.step + space.halfed, side: .left)
-                
-        let (averageVL, VL, Vl): (V, V, V) = {
+        
+        let (VL, Vl): (V, V) = {
             guard
-                let maxSystemP = eigenCell[tP]?[safe: x]?.last,
+                let systemP = eigenCell[tP]?[safe: x],
+                let maxSystemP = systemP.last,
                 maxSystemP.lambda > 0,
                 let vL = solution[tP]?[safe: xL],
                 let vR = solution[tP]?[safe: xR]
-            else { return (.zero, .zero, .zero) }
+            else { return (.zero, .zero) }
             
             let averageVL = averageBoundaryVp(
                 t: t, tP: tP, tau: tau, lambda: maxSystemP.lambda,
@@ -337,39 +340,52 @@ final class Gas1D: JSONConvertableAlgorithm {
                 vRL: .zero, vRM: .zero, vRR: .zero
             )
             
-            let averageVLSystem = Eigen.system(physical: averageVL, gamma: gamma).filter { $0.lambda > 0 }
+            let averageVLSystem = Eigen.system(physical: averageVL, gamma: gamma)
             
             /// for boundary
-            let VL = averageVLSystem.reduce(into: V.zero) { v, system in
-                let x = shifted(x: xR.value, lambda: system.lambda, tau: tau)
-                v += Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
+            let VL = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+                
+                guard system.lambda > 0 else { return () }
+                                
+                let systemP = systemP[pair.offset]
+                let x = shifted(x: xR.value, lambda: systemP.lambda, tau: tau)
+                let vp = Nvp(x: x, system: systemP, xL: xL.value, vL: vL, vM: v, vR: vR)
+                
+                result += V(vector: (system.l * vp) * system.r)
             }
             
             /// for flow
-            let Vl = averageVL + averageVLSystem.reduce(into: V.zero) { v, system in
+            let Vl = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+                
+                guard system.lambda > 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
                 let averageVp = averageBoundaryVp(
-                    t: t, tP: tP, tau: tau, lambda: system.lambda,
+                    t: t, tP: tP, tau: tau, lambda: systemP.lambda,
                     xLL: xL, xLM: x, xLR: xR,
                     xRL: .zero, xRM: .zero, xRR: .zero,
                     vLL: vL, vLM: v, vLR: vR,
                     vRL: .zero, vRM: .zero, vRR: .zero
                 )
-                
-                v += V(vector: system.r * (system.l * (averageVp - averageVL)))
+
+                result += V(vector: (system.l * averageVp) * system.r)
             }
             
-            return (averageVL, VL, Vl)
+            return (VL, Vl)
         }()
                         
-        let (averageVR, VR, Vr): (V, V, V) = {
+        let (VR, Vr): (V, V) = {
             guard
-                let minSystemP = eigenCell[tP]?[safe: xN]?.first,
+                let systemP = eigenCell[tP]?[safe: xN],
+                let minSystemP = systemP.first,
                 minSystemP.lambda < 0,
                 let vNL = solution[tP]?[safe: xNL],
                 let vN = solution[tP]?[safe: xN],
                 let vNR = solution[tP]?[safe: xNR]
             else {
-                return (.zero, .zero, .zero)
+                return (.zero, .zero)
             }
 
             let averageVR = averageBoundaryVp(
@@ -380,41 +396,53 @@ final class Gas1D: JSONConvertableAlgorithm {
                 vRL: vNL, vRM: vN, vRR: vNR
             )
             
-            let averageVRSystem = Eigen.system(physical: averageVR, gamma: gamma).filter {
-                $0.lambda < 0
-            }
+            let averageVRSystem = Eigen.system(physical: averageVR, gamma: gamma)
 
             /// for boundary
-            let VR = averageVRSystem.reduce(into: V.zero) { v, system in
+            let VR = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+                
+                guard system.lambda < 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
+                
                 let x = shifted(x: xR.value, lambda: system.lambda, tau: tau)
-                v += Nvp(x: x, system: system, xL: xNL.value, vL: vNL, vM: vN, vR: vNR)
+                let vp = Nvp(x: x, system: systemP, xL: xNL.value, vL: vNL, vM: vN, vR: vNR)
+                
+                result += V(vector: (system.l * vp) * system.r)
             }
 
             /// for flow
-            let Vr = averageVRSystem.reduce(into: V.zero) { v, system in
+            let Vr = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+                
+                guard system.lambda < 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
+                
                 let averageVp = averageBoundaryVp(
-                    t: t, tP: tP, tau: tau, lambda: system.lambda,
+                    t: t, tP: tP, tau: tau, lambda: systemP.lambda,
                     xLL: .zero, xLM: .zero, xLR: .zero,
                     xRL: xNL, xRM: xN, xRR: xNR,
                     vLL: .zero, vLM: .zero, vLR: .zero,
                     vRL: vNL, vRM: vN, vRR: vNR
                 )
 
-                v += V(vector: system.r * (system.l * (averageVp - averageVR)))
-            } - averageVR
+                result += V(vector: (system.l * averageVp) * system.r)
+            }
             
-            return (averageVR, VR, Vr)
+            return (VR, Vr)
         }()
         
-        let vStar = vStar(vL: averageVL, vR: averageVR)
+        let vStar = vStar(vL: VL, vR: VR)
         let newSystem = Eigen.system(physical: vStar, gamma: gamma)
-        let proportionalVStar = 0.5 * newSystem.reduce(into: V.zero) { v, system in
+        let proportionalVStar = 0.5 * newSystem.reduce(into: V.zero) { result, system in
             guard system.lambda.magnitude > .ulpOfOne else { return () }
 
             if system.lambda > 0 {
-                v += V(vector: (system.l * vStar) * system.r)
+                result += V(vector: (system.l * vStar) * system.r)
             } else {
-                v -= V(vector: (system.l * vStar) * system.r)
+                result -= V(vector: (system.l * vStar) * system.r)
             }
         }
         let newVR = 0.5 * (VL + VR) + proportionalVStar
@@ -422,8 +450,8 @@ final class Gas1D: JSONConvertableAlgorithm {
         solution[t]?[xR] = newVR
         eigenCell[t]?[x] = newSystem
 
-        let flowVL = F(physical: averageVL, gamma: gamma)
-        let flowVR = F(physical: averageVR, gamma: gamma)
+        let flowVL = F(physical: Vl, gamma: gamma)
+        let flowVR = F(physical: Vr, gamma: gamma)
         let flowVRVLHalved = 0.5 * (flowVL + flowVR)
 
         let M = Eigen.M(physical: vStar, gamma: gamma)
@@ -474,14 +502,15 @@ final class Gas1D: JSONConvertableAlgorithm {
         xR: BoundaryValue
     ) -> [Double] {
         
-        let (averageVR, VR, Vr): (V, V, V) = {
+        let (VR, Vr): (V, V) = {
             guard
-                let minSystemP = eigenCell[tP]?[safe: x]?.first,
+                let systemP = eigenCell[tP]?[safe: x],
+                let minSystemP = systemP.first,
                 minSystemP.lambda < 0,
                 let vL = solution[tP]?[safe: xL],
                 let vR = solution[tP]?[safe: xR]
             else {
-                return (.zero, .zero, .zero)
+                return (.zero, .zero)
             }
 
             let averageVR = averageBoundaryVp(
@@ -492,40 +521,51 @@ final class Gas1D: JSONConvertableAlgorithm {
                 vRL: vL, vRM: v, vRR: vR
             )
             
-            let averageVRSystem = Eigen.system(physical: averageVR, gamma: gamma).filter {
-                $0.lambda < 0
-            }
+            let averageVRSystem = Eigen.system(physical: averageVR, gamma: gamma)
 
             /// for boundary
-            let VR = averageVRSystem.reduce(into: V.zero) { v, system in
-                let x = shifted(x: xL.value, lambda: system.lambda, tau: tau)
-                v += Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
+            let VR = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+            
+                guard system.lambda < 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
+                let x = shifted(x: xL.value, lambda: systemP.lambda, tau: tau)
+                let vp = Nvp(x: x, system: systemP, xL: xL.value, vL: vL, vM: v, vR: vR)
+                
+                result += V(vector: (system.l * vp) * system.r)
             }
 
             /// for flow
-            let Vr = averageVRSystem.reduce(into: V.zero) { v, system in
+            let Vr = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+            
+                guard system.lambda < 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
                 let averageVp = averageBoundaryVp(
-                    t: t, tP: tP, tau: tau, lambda: system.lambda,
+                    t: t, tP: tP, tau: tau, lambda: systemP.lambda,
                     xLL: .zero, xLM: .zero, xLR: .zero,
                     xRL: xL, xRM: x, xRR: xR,
                     vLL: .zero, vLM: .zero, vLR: .zero,
                     vRL: vL, vRM: v, vRR: vR
                 )
 
-                v += V(vector: system.r * (system.l * (averageVp - averageVR)))
-            } - averageVR
+                result += V(vector: (system.l * averageVp) * system.r)
+            }
             
-            return (averageVR, VR, Vr)
+            return (VR, Vr)
         }()
         
-        let (averageVL, VL, Vl): (V, V, V) = {
+        let (VL, Vl): (V, V) = {
             guard
-                let maxSystemP = eigenCell[tP]?[safe: xP]?.last,
+                let systemP = eigenCell[tP]?[safe: xP],
+                let maxSystemP = systemP.last,
                 maxSystemP.lambda > 0,
                 let vPL = solution[tP]?[safe: xPL],
                 let vP = solution[tP]?[safe: xP],
                 let vPR = solution[tP]?[safe: xPR]
-            else { return (.zero, .zero, .zero) }
+            else { return (.zero, .zero) }
             
             let averageVL = averageBoundaryVp(
                 t: t, tP: tP, tau: tau, lambda: maxSystemP.lambda,
@@ -535,35 +575,47 @@ final class Gas1D: JSONConvertableAlgorithm {
                 vRL: .zero, vRM: .zero, vRR: .zero
             )
             
-            let averageVLSystem = Eigen.system(physical: averageVL, gamma: gamma).filter { $0.lambda > 0 }
+            let averageVLSystem = Eigen.system(physical: averageVL, gamma: gamma)
             
             /// for boundary
-            let VL = averageVLSystem.reduce(into: V.zero) { v, system in
+            let VL = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+            
+                guard system.lambda > 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
                 let x = shifted(x: xL.value, lambda: system.lambda, tau: tau)
-                v += Nvp(x: x, system: system, xL: xPL.value, vL: vPL, vM: vP, vR: vPR)
+                let vp = Nvp(x: x, system: systemP, xL: xPL.value, vL: vPL, vM: vP, vR: vPR)
+                
+                result += V(vector: (system.l * vp) * system.r)
             }
             
             /// for flow
-            let Vl = averageVL + averageVLSystem.reduce(into: V.zero) { v, system in
+            let Vl = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
+                let system = pair.element
+            
+                guard system.lambda > 0 else { return () }
+                
+                let systemP = systemP[pair.offset]
                 let averageVp = averageBoundaryVp(
-                    t: t, tP: tP, tau: tau, lambda: system.lambda,
+                    t: t, tP: tP, tau: tau, lambda: systemP.lambda,
                     xLL: xL, xLM: x, xLR: xR,
                     xRL: .zero, xRM: .zero, xRR: .zero,
                     vLL: vPL, vLM: vP, vLR: vPR,
                     vRL: .zero, vRM: .zero, vRR: .zero
                 )
                 
-                v += V(vector: system.r * (system.l * (averageVp - averageVL)))
+                result += V(vector: (system.l * averageVp) * system.r)
             }
             
-            return (averageVL, VL, Vl)
+            return (VL, Vl)
         }()
         
         let newVL = 0.5 * (VL + VR) + proportionalVStar
         solution[t]?[xL] = newVL
         
-        let flowVL = F(physical: averageVL, gamma: gamma)
-        let flowVR = F(physical: averageVR, gamma: gamma)
+        let flowVL = F(physical: Vl, gamma: gamma)
+        let flowVR = F(physical: Vr, gamma: gamma)
         let flowVRVLHalved = 0.5 * (flowVL + flowVR)
         
         let flowUL = flowVRVLHalved - 0.5 * newSystem.reduce(into: F.zero) { flow, system in
