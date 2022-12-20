@@ -1,0 +1,10 @@
+#!/bin/sh
+#SBATCH --job-name=Tokarev
+#SBATCH --time=01:00:00
+#SBATCH --nodes=1 --cpus-per-task=18
+#SBATCH --partition=release
+ulimit -l unlimited
+
+icpc -O2 -fopenmp -o run ./main/main_helmholtz.cpp ./helpers/helpers.cpp ./grid/1d/grid1d.cpp ./matrix/core/matrix.cpp ./matrix/algorithm/algorithm_helmholtz_mpi.cpp ./matrix/norms/norms.cpp ./tests/helmholtz/test_helmholtz_mpi.cpp
+mpirun -np 1 /nethome/student/FS19/FS2-x2/Tokarev/Parallels/run
+rm run

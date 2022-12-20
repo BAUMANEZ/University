@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		211F74CA29517A5D009AD908 /* main_helmoltz_mpi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */; };
 		211F74CD29517B28009AD908 /* test_helmholtz_mpi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 211F74CC29517B28009AD908 /* test_helmholtz_mpi.cpp */; };
+		211F74CF29517DD6009AD908 /* algorithm_helmholtz_mpi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 211F74CE29517DD6009AD908 /* algorithm_helmholtz_mpi.cpp */; };
 		2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3628F72CB7002B1E33 /* norms.cpp */; };
 		2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* test_lu.cpp */; };
 		2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2142775028F95BB2009EBA0D /* grid1d.cpp */; };
@@ -17,7 +17,7 @@
 		2196E7D728F0BAB70018B18F /* helpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2196E7D528F0BAB70018B18F /* helpers.cpp */; };
 		21BBD51C28F097610043676E /* matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BBD51B28F097610043676E /* matrix.cpp */; };
 		21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp */; };
-		21FEA12C28F075080070C7F7 /* main_helmholtz_omp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21FEA12B28F075080070C7F7 /* main_helmholtz_omp.cpp */; };
+		21FEA12C28F075080070C7F7 /* main_helmholtz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21FEA12B28F075080070C7F7 /* main_helmholtz.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,8 +33,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main_helmoltz_mpi.cpp; sourceTree = "<group>"; };
 		211F74CC29517B28009AD908 /* test_helmholtz_mpi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_helmholtz_mpi.cpp; sourceTree = "<group>"; };
+		211F74CE29517DD6009AD908 /* algorithm_helmholtz_mpi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm_helmholtz_mpi.cpp; sourceTree = "<group>"; };
 		2140BF3628F72CB7002B1E33 /* norms.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = norms.cpp; sourceTree = "<group>"; };
 		2140BF3728F72CB7002B1E33 /* norms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = norms.hpp; sourceTree = "<group>"; };
 		2140BF3C28F73140002B1E33 /* test_lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_lu.cpp; sourceTree = "<group>"; };
@@ -51,7 +51,7 @@
 		21BBD51B28F097610043676E /* matrix.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = matrix.cpp; sourceTree = "<group>"; };
 		21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm_helmholtz_omp.cpp; sourceTree = "<group>"; };
 		21FEA12828F075080070C7F7 /* Parallels */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Parallels; sourceTree = BUILT_PRODUCTS_DIR; };
-		21FEA12B28F075080070C7F7 /* main_helmholtz_omp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main_helmholtz_omp.cpp; sourceTree = "<group>"; };
+		21FEA12B28F075080070C7F7 /* main_helmholtz.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main_helmholtz.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,8 +68,7 @@
 		211F74CB29517A6D009AD908 /* main */ = {
 			isa = PBXGroup;
 			children = (
-				21FEA12B28F075080070C7F7 /* main_helmholtz_omp.cpp */,
-				211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */,
+				21FEA12B28F075080070C7F7 /* main_helmholtz.cpp */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -143,6 +142,7 @@
 				216C90A828F1835F00F3A88C /* algorithm.hpp */,
 				216C90A728F1835F00F3A88C /* algorithm_lu.cpp */,
 				21BFB55A28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp */,
+				211F74CE29517DD6009AD908 /* algorithm_helmholtz_mpi.cpp */,
 			);
 			path = algorithm;
 			sourceTree = "<group>";
@@ -257,10 +257,10 @@
 				21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp in Sources */,
 				2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */,
 				2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */,
-				211F74CA29517A5D009AD908 /* main_helmoltz_mpi.cpp in Sources */,
+				211F74CF29517DD6009AD908 /* algorithm_helmholtz_mpi.cpp in Sources */,
 				211F74CD29517B28009AD908 /* test_helmholtz_mpi.cpp in Sources */,
 				2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */,
-				21FEA12C28F075080070C7F7 /* main_helmholtz_omp.cpp in Sources */,
+				21FEA12C28F075080070C7F7 /* main_helmholtz.cpp in Sources */,
 				2142775728F9624B009EBA0D /* test_helmholtz_omp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

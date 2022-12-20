@@ -14,8 +14,7 @@
 #include "../../matrix/algorithm/algorithm.hpp"
 
 struct test_helmholtz final {
-    static void run_omp(bool paralleled);
-    static void run_mpi(bool paralleled);
+    static void run(bool paralleled);
 };
 
 #endif /* helmholtz_hpp */

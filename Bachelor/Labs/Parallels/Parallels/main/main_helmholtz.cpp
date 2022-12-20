@@ -8,7 +8,7 @@
 #include "../tests/helmholtz/test_helmholtz.hpp"
 
 int main(int argc, const char * argv[]) {
-    test_helmholtz::run_omp(false);
-    test_helmholtz::run_omp(true);
+    test_helmholtz::run(false);
+    test_helmholtz::run(true);
     return 0;
 }

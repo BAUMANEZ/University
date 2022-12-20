@@ -1,6 +1,6 @@
 #include "test_helmholtz.hpp"
 
-void test_helmholtz::run_mpi(bool paralleled) {
+void test_helmholtz::run(bool paralleled) {
     std::cout << (paralleled ? "PARALLELED" : "SEQUENTIAL") << "\n\n";
 
     for (size_t i = 1; i <= 4; ++i) {
