@@ -8,7 +8,7 @@
 #include "omp.h"
 #include "algorithm.hpp"
 
-size_t algorithm::helmholtz_red_black(
+size_t algorithm::omp_helmholtz_red_black(
     matrix& result,
     const double k, 
     const double h, 
@@ -36,7 +36,7 @@ size_t algorithm::helmholtz_red_black(
     return iterations;
 }
 
-size_t algorithm::helmholtz_jacobi(
+size_t algorithm::helmholtz_jacobi_omp(
     matrix& result,
     const double k, 
     const double h, 

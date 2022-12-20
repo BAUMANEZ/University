@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		211F74CA29517A5D009AD908 /* main_helmoltz_mpi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */; };
+		211F74CD29517B28009AD908 /* test_helmholtz_mpi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 211F74CC29517B28009AD908 /* test_helmholtz_mpi.cpp */; };
 		2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3628F72CB7002B1E33 /* norms.cpp */; };
 		2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2140BF3C28F73140002B1E33 /* test_lu.cpp */; };
 		2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2142775028F95BB2009EBA0D /* grid1d.cpp */; };
@@ -31,6 +33,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main_helmoltz_mpi.cpp; sourceTree = "<group>"; };
+		211F74CC29517B28009AD908 /* test_helmholtz_mpi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_helmholtz_mpi.cpp; sourceTree = "<group>"; };
 		2140BF3628F72CB7002B1E33 /* norms.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = norms.cpp; sourceTree = "<group>"; };
 		2140BF3728F72CB7002B1E33 /* norms.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = norms.hpp; sourceTree = "<group>"; };
 		2140BF3C28F73140002B1E33 /* test_lu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_lu.cpp; sourceTree = "<group>"; };
@@ -61,6 +65,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		211F74CB29517A6D009AD908 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				21FEA12B28F075080070C7F7 /* main_helmholtz_omp.cpp */,
+				211F74C929517A5D009AD908 /* main_helmoltz_mpi.cpp */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
 		2140BF3528F72CA5002B1E33 /* norms */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +123,7 @@
 			children = (
 				2142775628F9624B009EBA0D /* test_helmholtz.hpp */,
 				2142775528F9624B009EBA0D /* test_helmholtz_omp.cpp */,
+				211F74CC29517B28009AD908 /* test_helmholtz_mpi.cpp */,
 			);
 			path = helmholtz;
 			sourceTree = "<group>";
@@ -175,7 +189,7 @@
 				21BBD51528F091440043676E /* matrix */,
 				2142774E28F95B89009EBA0D /* grid */,
 				2140BF3A28F7311D002B1E33 /* tests */,
-				21FEA12B28F075080070C7F7 /* main_helmholtz_omp.cpp */,
+				211F74CB29517A6D009AD908 /* main */,
 			);
 			path = Parallels;
 			sourceTree = "<group>";
@@ -243,6 +257,8 @@
 				21BFB55B28F844ED00B7DA40 /* algorithm_helmholtz_omp.cpp in Sources */,
 				2140BF3828F72CB7002B1E33 /* norms.cpp in Sources */,
 				2140BF3E28F73140002B1E33 /* test_lu.cpp in Sources */,
+				211F74CA29517A5D009AD908 /* main_helmoltz_mpi.cpp in Sources */,
+				211F74CD29517B28009AD908 /* test_helmholtz_mpi.cpp in Sources */,
 				2142775228F95BB2009EBA0D /* grid1d.cpp in Sources */,
 				21FEA12C28F075080070C7F7 /* main_helmholtz_omp.cpp in Sources */,
 				2142775728F9624B009EBA0D /* test_helmholtz_omp.cpp in Sources */,

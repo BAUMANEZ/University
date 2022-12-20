@@ -24,7 +24,7 @@ struct algorithm final {
      
 //MARK: - Helmholtz
  public:
-    static size_t helmholtz_red_black(
+    static size_t helmholtz_red_black_omp(
         matrix& result,
         const double k, 
         const double h, 
@@ -32,7 +32,7 @@ struct algorithm final {
         const grid1d& y,
         const func2d& values
     );
-   static size_t helmholtz_jacobi(
+   static size_t helmholtz_jacobi_omp(
         matrix& result,
         const double k, 
         const double h, 

@@ -5,6 +5,7 @@
 //  Created by Арсений Токарев on 12.10.2022.
 //
 
+#include "omp.h"
 #include "test_lu.hpp"
 
 void test_lu::run(method method, bool paralleled) {

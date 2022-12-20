@@ -10,16 +10,15 @@
 
 double norms::frobenius(const matrix& lhs, const matrix& rhs) {
     // assert_message(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols(), "Dimensions are not equal");
-    double result = 0.;
-//#pragma omp parallel for default(none) shared(result, lhs, rhs)
-    for (size_t i = 0; i < lhs.rows(); ++i) {
+    double sum = 0.;
+#pragma omp parallel for default(none) shared(lhs, rhs) reduction(+:sum)
+    for (size_t i = 0; i < lhs.rows(); ++i)
         for (size_t j = 0; j < lhs.cols(); ++j) {
             const double diff = lhs.elem(i, j)-rhs.elem(i, j);
-            result += diff*diff;
+            sum += diff*diff;
         }
-    }
-
-    return sqrt(result);
+    
+    return sqrt(sum);
 }
 double norms::max_error(const matrix& lhs, const matrix& rhs) {
     // assert_message(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols(), "Dimensions are not equal");
