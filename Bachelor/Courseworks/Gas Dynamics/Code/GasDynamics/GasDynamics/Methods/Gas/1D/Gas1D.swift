@@ -120,9 +120,21 @@ final class Gas1D: JSONConvertableAlgorithm {
         }
         
         public init(density: Double, speed: Double, pressure: Double, gamma: Double = Constants.gamma) {
-            u1 = density
-            u2 = density * speed
-            u3 = Formulas.energy(density: density, speed: speed, pressure: pressure, gamma: gamma)
+            self.init(
+                u1: density,
+                u2: density * speed,
+                u3: Formulas.energy(density: density, speed: speed, pressure: pressure, gamma: gamma)
+            )
+        }
+        
+        public init(vector: [Double]) {
+            self.init(u1: vector[0], u2: vector[1], u3: vector[2])
+        }
+        
+        public init(u1: Double, u2: Double, u3: Double) {
+            self.u1 = u1
+            self.u2 = u2
+            self.u3 = u3
         }
     }
     
@@ -154,6 +166,12 @@ final class Gas1D: JSONConvertableAlgorithm {
             lhs.f1 += rhs.f1
             lhs.f2 += rhs.f2
             lhs.f3 += rhs.f3
+        }
+        
+        static func -=(lhs: inout F, rhs: F) {
+            lhs.f1 -= rhs.f1
+            lhs.f2 -= rhs.f2
+            lhs.f3 -= rhs.f3
         }
         
         // MARK: - Internal properties
@@ -253,21 +271,16 @@ final class Gas1D: JSONConvertableAlgorithm {
             let x  = BoundaryValue(value: node, side: .middle)
             let xR = BoundaryValue(value: node + space.halfed, side: .left)
             let vL = v0(xL.value)
+            let v = v0(x.value)
             let vR = v0(xR.value)
-            
-            let vStar = vStar(vL: vL, vR: vR)
-            let system = Eigen.system(physical: vStar, gamma: gamma)
-            eigenCell[t]?[x] = system
-            
-            let v = system.reduce(into: V.zero) { v, system in
-                v += V(vector: 0.5 * (system.l * vL + system.l * vR) * system.r)
-            }
             
             mesh[xL] = vL
             mesh[x]  = v
             mesh[xR] = vR
+            
+            eigenCell[t]?[x] = Eigen.system(physical: v, gamma: gamma)
         }
-        
+                
         while t < T {
             guard let meshP = solution[t] else { assertionFailure("Time iteration error"); return }
             
@@ -277,18 +290,46 @@ final class Gas1D: JSONConvertableAlgorithm {
             solution[t] = [:]
             eigenCell[t] = [:]
             
+            print("-------\(t)-------")
+            
             space.nodes().forEach { node in
                 let x = BoundaryValue(value: node, side: .middle)
                 
-                guard let v = solution[tP]?[safe: x] else { return }
+                guard let v = solution[tP]?[safe: x] else { fatalError() }
                 
-                let stepFlowDifference = stepflowDifference(t: t, tP: tP, tau: tau, node: node, v: v)
+                let xPL = BoundaryValue(value: node - space.step - space.halfed, side: .right)
+                let xP = BoundaryValue(value: node - space.step, side: .middle)
+                let xPR = BoundaryValue(value: node - space.step + space.halfed, side: .left)
+                let xL = BoundaryValue(value: node - space.halfed, side: .right)
+                let xR = BoundaryValue(value: node + space.halfed, side: .left)
+                let xNL = BoundaryValue(value: node + space.step - space.halfed, side: .right)
+                let xN = BoundaryValue(value: node + space.step, side: .middle)
+                let xNR = BoundaryValue(value: node + space.step + space.halfed, side: .left)
                 
-                let newV = v - tau / space.step * stepFlowDifference
+                let (vR, flowR) = calculateFlowAndNewBoundaryV(
+                    tP: tP, tau: tau,
+                    xPL: xL, xP: x, xPR: xR,
+                    xNL: xNL, xN: xN, xNR: xNR
+                )
                 
+                let (vL, flowL) = calculateFlowAndNewBoundaryV(
+                    tP: tP, tau: tau,
+                    xPL: xPL, xP: xP, xPR: xPR,
+                    xNL: xL, xN: x, xNR: xR
+                )
+                                
+                solution[t]?[xL] = vL
+                solution[t]?[xR] = vR
+                
+                let u = U(physical: v, gamma: gamma)
+                let newUVector = u.plain - tau / space.step * (flowR - flowL).plain
+                let invM = Eigen.InvM(conservative: U(vector: newUVector), gamma: gamma)
+                let newV = V(vector: invM * newUVector)
+                
+                eigenCell[t]?[x] = Eigen.system(physical: newV, gamma: gamma)
                 solution[t]?[x] = newV
             }
-            
+
             return
         }
     }
@@ -308,169 +349,186 @@ final class Gas1D: JSONConvertableAlgorithm {
         return l * v
     }
     
-    private func stepflowDifference(
-        t: Double,
+    private func calculateFlowAndNewBoundaryV(
         tP: Double,
         tau: Double,
-        node: Double,
-        v: V
-    ) -> V {
-        let xL = BoundaryValue(value: node - space.halfed, side: .right)
-        let x = BoundaryValue(value: node, side: .middle)
-        let xR = BoundaryValue(value: node + space.halfed, side: .left)
+        xPL: BoundaryValue,
+        xP : BoundaryValue,
+        xPR: BoundaryValue,
+        xNL: BoundaryValue,
+        xN : BoundaryValue,
+        xNR: BoundaryValue
+    ) -> (V, F) {
         
-        let xNL = BoundaryValue(value: node + space.step - space.halfed, side: .right)
-        let xN = BoundaryValue(value: node + space.step, side: .middle)
-        let xNR = BoundaryValue(value: node + space.step + space.halfed, side: .left)
-        
-        let (VL, Vl) = leftSidePair(t: t, tP: tP, tau: tau, xL: xL, x: x, xR: xR)
-        let (VR, Vr) = rightSidePair(t: t, tP: tP, tau: tau, xL: xNL, x: xN, xR: xNR)
-        let vStar = vStar(vL: VL, vR: VR)
-        let newSystem = Eigen.system(physical: vStar, gamma: gamma)
-        let proportionalVStar = 0.5 * newSystem.reduce(into: V.zero) { result, system in
-            guard system.lambda.magnitude > .ulpOfOne else { return () }
-
-            if system.lambda > 0 {
-                result += V(vector: (system.l * vStar) * system.r)
-            } else {
-                result -= V(vector: (system.l * vStar) * system.r)
+        let (VL, Vl): (V, V) = {
+            guard
+                let systemL = eigenCell[tP]?[safe: xP],
+                let vL = solution[tP]?[safe: xPL],
+                let v = solution[tP]?[safe: xP],
+                let vR = solution[tP]?[safe: xPR]
+            else {
+                let vl = v0(space.start)
+                
+                return (vl, vl)
             }
-        }
-        let newVR = 0.5 * (VL + VR) + proportionalVStar
+            
+            guard !systemL.contains(where: { $0.lambda.isZero }) else {
+                let vl = solution[tP]?[safe: xPR] ?? .zero
+                
+                return (vl, vl)
+            }
+            
+            return leftSidePair(system: systemL, tau: tau, xL: xPL, x: xP, xR: xPR, vL: vL, v: v, vR: vR)
+        }()
         
-        solution[t]?[xR] = newVR
-        eigenCell[t]?[x] = newSystem
+        let (VR, Vr): (V, V) = {
+            guard
+                let systemR = eigenCell[tP]?[safe: xN],
+                let vL = solution[tP]?[safe: xNL],
+                let v = solution[tP]?[safe: xN],
+                let vR = solution[tP]?[safe: xNR]
+            else {
+                let vr = v0(space.end)
+                
+                return (vr, vr)
+            }
+            
+            guard !systemR.contains(where: { $0.lambda.isZero }) else {
+                let vl = solution[tP]?[safe: xNR] ?? .zero
+                
+                return (vl, vl)
+            }
 
-        let flowVL = F(physical: Vl, gamma: gamma)
-        let flowVR = F(physical: Vr, gamma: gamma)
-        let flowVRVLHalved = 0.5 * (flowVL + flowVR)
-
+            return rightSidePair(system: systemR, tau: tau, xL: xNL, x: xN, xR: xNR, vL: vL, v: v, vR: vR)
+        }()
+        
+        let vStar = vStar(vL: VL, vR: VR)
+        let systemVStar = Eigen.system(physical: vStar, gamma: gamma)
+        
+        var newBoundaryV = 0.5 * (VL + VR)
+        var flow = 0.5 * (F(physical: Vl, gamma: gamma) + F(physical: Vr, gamma: gamma))
+        
+        guard !systemVStar.contains(where: { $0.lambda.isZero }) else {
+            return (newBoundaryV, flow)
+        }
+        
         let M = Eigen.M(physical: vStar, gamma: gamma)
-
-        let flowUR = flowVRVLHalved - 0.5 * newSystem.reduce(into: F.zero) { flow, system in
-            flow += F(vector: system.lambda.magnitude * (system.l * (Vr - Vl)) * (M * system.r) )
-        }
         
-        let invM = Eigen.InvM(physical: vStar, gamma: gamma)
-        let stepFlowR = (invM * flowUR.plain)
-        
-        let stepFlowL = leftStepFlowDifference(
-            t: t,
-            tP: tP,
-            tau: tau,
-            vStar: vStar,
-            proportionalVStar: proportionalVStar,
-            v: v,
-            newSystem: newSystem,
-            M: M,
-            invM: invM,
-            xL: xL, x: x, xR: xR
-        )
-        
-        return V(vector: stepFlowR - stepFlowL)
-    }
+        systemVStar.forEach { system in
+            let vp = 0.5 * V(vector: (system.l * vStar) * system.r)
     
-    private func leftStepFlowDifference(
-        t: Double,
-        tP: Double,
-        tau: Double,
-        vStar: V,
-        proportionalVStar: V,
-        v: V,
-        newSystem: [Eigen.System],
-        M: Matrix,
-        invM: Matrix,
-        xL: BoundaryValue,
-        x: BoundaryValue,
-        xR: BoundaryValue
-    ) -> [Double] {
-        
-        let xPL = BoundaryValue(value: x.value - space.step - space.halfed, side: .right)
-        let xP = BoundaryValue(value: x.value - space.step, side: .middle)
-        let xPR = BoundaryValue(value: x.value - space.step + space.halfed, side: .left)
-        
-        let (VL, Vl) = leftSidePair(t: t, tP: tP, tau: tau, xL: xPL, x: xP, xR: xPR)
-        let (VR, Vr) = rightSidePair(t: t, tP: tP, tau: tau, xL: xL, x: x, xR: xR)
-        
-        let newVL = 0.5 * (VL + VR) + proportionalVStar
-        solution[t]?[xL] = newVL
-        
-        let flowVL = F(physical: Vl, gamma: gamma)
-        let flowVR = F(physical: Vr, gamma: gamma)
-        let flowVRVLHalved = 0.5 * (flowVL + flowVR)
-        
-        let flowUL = flowVRVLHalved - 0.5 * newSystem.reduce(into: F.zero) { flow, system in
-            flow += F(vector: system.lambda.magnitude * (system.l * (Vr - Vl)) * (M * system.r) )
+            if system.lambda > 0 {
+                newBoundaryV += vp
+            } else {
+                newBoundaryV -= vp
+            }
+            
+            flow -= 0.5 * system.lambda.magnitude * F(vector: (system.l * (Vr - Vl)) * (M * system.r))
         }
         
-        let stepFlowL = (invM * flowUL.plain)
-        
-        return stepFlowL
+        return (newBoundaryV, flow)
     }
     
     private func leftSidePair(
-        t: Double,
-        tP: Double,
+        system systemP: [Eigen.System],
         tau: Double,
         xL: BoundaryValue,
         x: BoundaryValue,
-        xR: BoundaryValue
+        xR: BoundaryValue,
+        vL: V,
+        v: V,
+        vR: V
     ) -> (V, V) {
         guard
-            let systemP = eigenCell[tP]?[safe: x],
             let maxSystemP = systemP.last,
-            maxSystemP.lambda > 0,
-            let vL = solution[tP]?[safe: xL],
-            let v = solution[tP]?[safe: x],
-            let vR = solution[tP]?[safe: xR]
+            maxSystemP.lambda > 0
         else { return (.zero, .zero) }
         
         let averageVL = averageBoundaryVp(
-            t: t, tP: tP, tau: tau, lambda: maxSystemP.lambda, boundary: xR,
+            tau: tau, system: maxSystemP, boundary: xR,
             xL: xL, x: x, xR: xR,
             vL: vL, v: v, vR: vR
         )
-        
-        let averageVLSystem = Eigen.system(physical: averageVL, gamma: gamma)
-        
+                
         /// for boundary
-        let VL = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
-            let system = pair.element
-            
+        let VL = systemP.reduce(into: V.zero) { result, system in
             guard system.lambda > 0 else { return () }
-                            
-            let systemP = systemP[pair.offset]
-            let x = shifted(x: xR.value, lambda: systemP.lambda, tau: tau)
-            let vp = Nvp(x: x, system: systemP, xL: xL.value, vL: vL, vM: v, vR: vR)
             
-            result += V(vector: (system.l * vp) * system.r)
+            let x = shifted(x: xR.value, lambda: system.lambda, tau: tau)
+            let vp = Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
+            
+            result += vp
         }
         
         /// for flow
-        let Vl = averageVLSystem.enumerated().reduce(into: V.zero) { result, pair in
-            let system = pair.element
-            
+        let Vl = averageVL + systemP.reduce(into: V.zero) { result, system in
             guard system.lambda > 0 else { return () }
             
-            let systemP = systemP[pair.offset]
             let averageVp = averageBoundaryVp(
-                t: t, tP: tP, tau: tau, lambda: systemP.lambda, boundary: xR,
+                tau: tau, system: system, boundary: xR,
                 xL: xL, x: x, xR: xR,
                 vL: vL, v: v, vR: vR
             )
-
-            result += V(vector: (system.l * averageVp) * system.r)
+                        
+            result += V(vector: system.r * (system.l * (averageVp - averageVL)))
         }
         
         return (VL, Vl)
     }
     
+    private func rightSidePair(
+        system systemP: [Eigen.System],
+        tau: Double,
+        xL: BoundaryValue,
+        x: BoundaryValue,
+        xR: BoundaryValue,
+        vL: V,
+        v: V,
+        vR: V
+    ) -> (V, V) {
+        guard
+            let minSystemP = systemP.first,
+            minSystemP.lambda < 0
+        else { return (.zero, .zero) }
+
+        let averageVR = averageBoundaryVp(
+            tau: tau, system: minSystemP, boundary: xL,
+            xL: xL, x: x, xR: xR,
+            vL: vL, v: v, vR: vR
+        )
+        
+        /// for boundary
+        let VR = systemP.reduce(into: V.zero) { result, system in
+            guard system.lambda < 0 else { return () }
+                        
+            let x = shifted(x: xL.value, lambda: system.lambda, tau: tau)
+            let vp = Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
+            
+            result += vp
+        }
+
+        /// for flow
+        let Vr = averageVR - systemP.reduce(into: V.zero) { result, system in
+            guard system.lambda < 0 else { return () }
+            
+            let averageVp = averageBoundaryVp(
+                tau: tau, system: system, boundary: xL,
+                xL: xL, x: x, xR: xR,
+                vL: vL, v: v, vR: vR
+            )
+
+            result += V(vector: system.r * ((averageVp - averageVR) * system.l))
+        }
+        
+        return (VR, Vr)
+    }
+    
     private func vStar(vL: V, vR: V) -> V {
-        guard vL.density.magnitude > .ulpOfOne else {
+        guard !vL.density.isZero else {
             return vR
         }
         
-        guard vR.density.magnitude > .ulpOfOne else {
+        guard !vR.density.isZero else {
             return vL
         }
         
@@ -488,73 +546,10 @@ final class Gas1D: JSONConvertableAlgorithm {
         
         return V(density: density, speed: speed, pressure: pressure)
     }
-    
-    private func rightSidePair(
-        t: Double,
-        tP: Double,
-        tau: Double,
-        xL: BoundaryValue,
-        x: BoundaryValue,
-        xR: BoundaryValue
-    ) -> (V, V) {
-        guard
-            let systemP = eigenCell[tP]?[safe: x],
-            let minSystemP = systemP.first,
-            minSystemP.lambda < 0,
-            let vL = solution[tP]?[safe: xL],
-            let v = solution[tP]?[safe: x],
-            let vR = solution[tP]?[safe: xR]
-        else {
-            return (.zero, .zero)
-        }
-
-        let averageVR = averageBoundaryVp(
-            t: t, tP: tP, tau: tau, lambda: minSystemP.lambda, boundary: xL,
-            xL: xL, x: x, xR: xR,
-            vL: vL, v: v, vR: vR
-        )
-        
-        let averageVRSystem = Eigen.system(physical: averageVR, gamma: gamma)
-
-        /// for boundary
-        let VR = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
-            let system = pair.element
-            
-            guard system.lambda < 0 else { return () }
-            
-            let systemP = systemP[pair.offset]
-            
-            let x = shifted(x: xR.value, lambda: system.lambda, tau: tau)
-            let vp = Nvp(x: x, system: systemP, xL: xL.value, vL: vL, vM: v, vR: vR)
-            
-            result += V(vector: (system.l * vp) * system.r)
-        }
-
-        /// for flow
-        let Vr = averageVRSystem.enumerated().reduce(into: V.zero) { result, pair in
-            let system = pair.element
-            
-            guard system.lambda < 0 else { return () }
-            
-            let systemP = systemP[pair.offset]
-            
-            let averageVp = averageBoundaryVp(
-                t: t, tP: tP, tau: tau, lambda: systemP.lambda, boundary: xL,
-                xL: xL, x: x, xR: xR,
-                vL: vL, v: v, vR: vR
-            )
-
-            result += V(vector: (system.l * averageVp) * system.r)
-        }
-        
-        return (VR, Vr)
-    }
 
     private func averageBoundaryVp(
-        t: Double,
-        tP: Double,
         tau: Double,
-        lambda: Double,
+        system: Eigen.System,
         boundary: BoundaryValue,
         xL: BoundaryValue,
         x: BoundaryValue,
@@ -563,25 +558,20 @@ final class Gas1D: JSONConvertableAlgorithm {
         v: V,
         vR: V
     ) -> V {
-        guard
-            lambda.magnitude > .ulpOfOne,
-            let systemP = eigenCell[tP]?[safe: x]
-        else { return .zero }
+        guard !system.lambda.isZero else { return .zero }
         
-        let delta = lambda * tau
-        let shiftedX = shifted(x: boundary.value, lambda: lambda, tau: tau)
+        let delta = system.lambda * tau
+        let shiftedX = shifted(x: boundary.value, lambda: system.lambda, tau: tau)
         
-        return systemP.reduce(into: V.zero) { v, system in
-            let alphaLp = alpha(v: vL, l: system.l)
-            let alphaMp = alpha(v: v, l: system.l)
-            let alphaRp = alpha(v: vR, l: system.l)
-            
-            let alpha1 = NalphaP(x: shiftedX, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-            let alpha2 = NalphaP(x: shiftedX + 0.5 * delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-            let alpha3 = NalphaP(x: shiftedX + delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-            
-            v += V(vector: (1 / 6 * (alpha1 + 4 * alpha2 + alpha3)) * system.r)
-        }
+        let alphaLp = alpha(v: vL, l: system.l)
+        let alphaMp = alpha(v: v, l: system.l)
+        let alphaRp = alpha(v: vR, l: system.l)
+        
+        let alpha1 = NalphaP(x: shiftedX, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
+        let alpha2 = NalphaP(x: shiftedX + 0.5 * delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
+        let alpha3 = NalphaP(x: shiftedX + delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
+        
+        return V(vector: (1 / 6 * (alpha1 + 4 * alpha2 + alpha3)) * system.r)
     }
     
     private func Nv(
@@ -609,8 +599,8 @@ final class Gas1D: JSONConvertableAlgorithm {
         vM: V,
         vR: V
     ) -> V {
-        return system.reduce(into: V.zero) { v, system in
-            v += Nvp(x: x, system: system, xL: xL, vL: vL, vM: vM, vR: vR)
+        return system.reduce(into: V.zero) { result, system in
+            result += Nvp(x: x, system: system, xL: xL, vL: vL, vM: vM, vR: vR)
         }
     }
     
@@ -744,6 +734,8 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> [System] {
+            guard !density.isZero else { fatalError() }
+            
             let lambdas = Lambda(density: density, speed: speed, pressure: pressure, gamma: gamma)
             let R = R(density: density, speed: speed, pressure: pressure, gamma: gamma)
             let L = L(density: density, speed: speed, pressure: pressure, gamma: gamma)
@@ -780,6 +772,8 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> [[Double]] {
+            guard !density.isZero else { fatalError() }
+            
             let c = Constants.speedOfSound(density: density, pressure: pressure, gamma: gamma)
             
             return [
@@ -799,6 +793,8 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> [[Double]] {
+            guard !density.isZero else { fatalError() }
+            
             let c = Constants.speedOfSound(density: density, pressure: pressure, gamma: gamma)
             
             return [
@@ -815,9 +811,10 @@ extension Gas1D {
         static func M(
             density: Double,
             speed: Double,
-            pressure: Double,
             gamma: Double = Constants.gamma
         ) -> Matrix {
+            guard !density.isZero else { fatalError() }
+            
             var result = Matrix(n: 3, initial: 0)
 
             result[0,0] = 1
@@ -836,13 +833,12 @@ extension Gas1D {
         }
         
         static func M(physical v: V, gamma: Double = Constants.gamma) -> Matrix {
-            return M(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
+            return M(density: v.density, speed: v.speed, gamma: gamma)
         }
         
         static func InvM(
             density: Double,
             speed: Double,
-            pressure: Double,
             gamma: Double = Constants.gamma
         ) -> Matrix {
             var result = Matrix(n: 3, initial: 0)
@@ -863,7 +859,11 @@ extension Gas1D {
         }
         
         static func InvM(physical v: V, gamma: Double = Constants.gamma) -> Matrix {
-            return InvM(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
+            return InvM(density: v.density, speed: v.speed, gamma: gamma)
+        }
+        
+        static func InvM(conservative u: U, gamma:Double = Constants.gamma) -> Matrix {
+            return InvM(density: u.u1, speed: u.u2 / u.u1, gamma: gamma)
         }
     }
 }

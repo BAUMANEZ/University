@@ -66,3 +66,10 @@ extension Dictionary where Key == BoundaryValue {
         }
     }
 }
+
+extension Double {
+    
+    public var isZero: Bool {
+        return magnitude < .ulpOfOne
+    }
+}
