@@ -1,0 +1,85 @@
+!очистить всё
+/CLEAR,ALL
+
+!поменять цвет фона на белый
+/RGB,INDEX,100,100,100, 0   
+/RGB,INDEX, 80, 80, 80,13   
+/RGB,INDEX, 60, 60, 60,14   
+/RGB,INDEX, 0, 0, 0,15  
+
+!константы
+L=0.5 !(м)
+H=0.1 !(м)
+E=2E11!(Па)
+MU=0.3
+P=5E6!(Па)
+N=100 !Кол-во элеменов по высоте 
+
+!Выбор типа расчета
+KEYW,PR_SET,1 !Structural   
+KEYW,PR_STRUC,1 
+KEYW,PR_THERM,0 
+KEYW,PR_FLUID,0 
+KEYW,PR_ELMAG,0 
+KEYW,MAGNOD,0   
+KEYW,MAGEDG,0   
+KEYW,MAGHFE,0   
+KEYW,MAGELC,0   
+KEYW,PR_MULTI,0 
+
+!заходим в препроцессор
+/PREP7
+
+! Ввод кейпоинтов
+K,1,0,0,0,  
+K,2,L,,,
+K,3,L,H,0,  
+K,4,0,H,,
+
+! Ввод линий
+LSTR,       1,       2  
+LSTR,       2,       3  
+LSTR,       3,       4  
+LSTR,       4,       1
+ 
+!Ввод поверхности
+AL,1,2,3,4
+
+! Номер КЭ 
+ET,1,PLANE182   
+  
+! Свойства материала (Модуль Юнга Коэф Пуассона)
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,EX,1,,e  
+MPDATA,PRXY,1,,mu  
+
+! Выбор всех линий
+LSEL, , , ,1,4,1
+! Разбиение всех линий на КЭ длиной H/N
+LESIZE,ALL,H/N, , , , , , ,1
+ALLSEL,ALL
+! Разбиение поверхности
+AMESH,1   
+
+!выход из препроцессора
+FINISH  
+
+!вход в блок solution
+/SOL
+
+!Задание закремлений левого торца балки 
+DK,1, , , ,0,UX, , , , , 
+DL,4, ,UX, 
+DK,1, , , ,0,UY, , , , , ,   
+
+!Приложение распределенной нагрузки
+SFL,3,PRES,P,
+
+SOLVE   
+FINISH  
+
+!вход в блок postprocessor
+/POST1  
+!Построение поля перемещений
+PLNSOL, U,SUM, 0, 1.0

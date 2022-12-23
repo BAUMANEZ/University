@@ -285,6 +285,9 @@ final class Gas1D: JSONConvertableAlgorithm {
             guard let meshP = solution[t] else { assertionFailure("Time iteration error"); return }
             
             let tau = tau(average: Set(meshP.filter{ $0.key.side == .middle}.values))
+            
+            guard tau.isNormal && tau > 0 else { return }
+            
             let tP = t
             t += tau
             solution[t] = [:]
@@ -329,8 +332,6 @@ final class Gas1D: JSONConvertableAlgorithm {
                 eigenCell[t]?[x] = Eigen.system(physical: newV, gamma: gamma)
                 solution[t]?[x] = newV
             }
-
-            return
         }
     }
     
