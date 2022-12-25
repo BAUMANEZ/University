@@ -1,0 +1,10 @@
+#!/bin/sh
+#SBATCH --job-name=Tokarev
+#SBATCH --time=01:00:00
+#SBATCH --nodes=3 --cpus-per-task=18
+#SBATCH --partition=release
+ulimit -l unlimited
+
+mpiicpc -o run ./main/main.cpp ./helpers/helpers.cpp ./tests/helmholtz/mpi/test_helmholtz_mpi.cpp
+mpirun -np 54 /nethome/student/FS19/FS2-x2/Tokarev/Parallels/run
+rm run
