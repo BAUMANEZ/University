@@ -29,4 +29,6 @@ int number_of_digits(double num, int precision = 16);
 
 std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref);
 
+bool is_first_or_last(int index, int size);
+
 #endif /* helpers_hpp */

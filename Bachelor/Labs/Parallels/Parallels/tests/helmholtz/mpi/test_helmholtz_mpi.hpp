@@ -29,10 +29,14 @@ public:
     static void run(int* argc, char*** argv, int i, std::vector<test_case> tests);
     
 private:
-    static void prepare(
-        std::vector<double>& matrix,
-        std::vector<int>& rows_per_process
-        const test_helmholtz_mpi& configuration
+    void prepare(
+        std::vector<double>& analytical,
+        std::vector<int>& rows_per_process,
+        std::vector<int>& shifts,
+        int& recv_elements,
+        std::vector<int>& elements_per_process,
+        int& rows,
+        int& rows_upto_rank
     );
     
     void run_jacobi_send_recv();
@@ -50,6 +54,8 @@ private:
     double f(double x, double y);
     double analytical(double x, double y);
     double norm(const std::vector<double>& lhs, const std::vector<double>& rhs);
+    
+    void make_analytical(std::vector<double>& analytical);
     
     test_helmholtz_mpi(int i);
 };

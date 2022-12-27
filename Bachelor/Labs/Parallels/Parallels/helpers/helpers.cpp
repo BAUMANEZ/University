@@ -67,3 +67,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<double>& ref) {
     out << "\n";
     return out;
 }
+
+bool is_first_or_last(int index, int size) {
+    return (index == 0) || (index == size - 1);
+}
