@@ -1,0 +1,3 @@
+mpicxx -std=c++11 -o run ./main/_main.cpp ./helpers/helpers.cpp ./tests/n_bodies/mpi/n_bodies_mpi.cpp
+mpirun -np 4 run
+rm run

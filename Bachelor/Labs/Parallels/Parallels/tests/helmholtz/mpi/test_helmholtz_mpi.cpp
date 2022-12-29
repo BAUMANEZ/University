@@ -85,31 +85,31 @@ void test_helmholtz_mpi::run(int* argc, char*** argv, int i, std::vector<test_ca
                 
                 MPI_Barrier(MPI_COMM_WORLD);
                 if (rank == 0)
-                    std::cout << "@@@@@ FINISHED MPI BLACK SEND_RECV ALGORITHM @@@@@\n\n";
+                    std::cout << "@@@@@ FINISHED MPI RED-BLACK SEND_RECV ALGORITHM @@@@@\n\n";
                 
                 break;
                 
             case test_helmholtz_mpi::red_black_sendrecv:
                 if (rank == 0)
-                    std::cout << "***** RUNNING MPI BLACK SENDRECV ALGORITHM *****\n";
+                    std::cout << "***** RUNNING MPI RED-BLACK SENDRECV ALGORITHM *****\n";
 
                 configuration.run_red_black_sendrecv();
 
                 MPI_Barrier(MPI_COMM_WORLD);
                 if (rank == 0)
-                    std::cout << "@@@@@ FINISHED MPI BLACK SENDRECV ALGORITHM @@@@@\n\n";
+                    std::cout << "@@@@@ FINISHED MPI RED-BLACK SENDRECV ALGORITHM @@@@@\n\n";
 
                 break;
                 
             case test_helmholtz_mpi::red_black_isend_irecv:
                 if (rank == 0)
-                    std::cout << "***** RUNNING MPI BLACK ISEND_IRECV ALGORITHM *****\n";
+                    std::cout << "***** RUNNING MPI RED-BLACK ISEND_IRECV ALGORITHM *****\n";
 
                 configuration.run_red_black_isend_irecv();
 
                 MPI_Barrier(MPI_COMM_WORLD);
                 if (rank == 0)
-                    std::cout << "@@@@@ FINISHED MPI BLACK ISEND_IRECV ALGORITHM @@@@@\n\n";
+                    std::cout << "@@@@@ FINISHED MPI RED-BLACK ISEND_IRECV ALGORITHM @@@@@\n\n";
 
                 break;
                 
@@ -155,7 +155,6 @@ void test_helmholtz_mpi::prepare(
         rows_per_process[size - 1] -= 1;
     }
     
-    // MARK: пересылаем в другие процессы количество нужной информации
     MPI_Bcast(rows_per_process.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(shifts.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
     
