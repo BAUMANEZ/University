@@ -29,14 +29,14 @@ extension Gas1D {
             N: 100,
             initial: { x in
                 switch x {
-                case -1 ... 0:
+                case -Double.leastNormalMagnitude ... 0:
                     return V(density: 1, speed: 0, pressure: 1)
                     
-                case 0 ... 1:
+                case 0 ... Double.greatestFiniteMagnitude:
                     return V(density: 0.125, speed: 0, pressure: 0.1)
                     
                 default:
-                    return .zero
+                    return V(density: 1, speed: 0, pressure: 1)
                 }
             }
         )

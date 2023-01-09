@@ -7,6 +7,50 @@
 
 import Foundation
 
+struct GridCell: Hashable, Comparable {
+    
+    //MARK: - Static Methods
+    
+    static func < (lhs: GridCell, rhs: GridCell) -> Bool {
+        return lhs.value < rhs.value
+    }
+    static func == (lhs: GridCell, rhs: GridCell) -> Bool {
+        return (lhs.value - rhs.value).magnitude.isZero
+    }
+    
+    // MARK: - Internal Properties
+        
+    let left: Double
+    let value: Double
+    let right: Double
+    
+    // MARK: - Initializers
+    
+    init(value: Double, grid: Grid) {
+        self.value = value
+        
+        left = value - grid.halfed
+        right = value + grid.halfed
+    }
+}
+
+extension Dictionary where Key == Double {
+    
+    subscript(safe key: Double) -> Value? {
+        get {
+            guard let key = keys.first(where: { ($0 - key).magnitude.isZero }) else { return nil }
+            
+            return self[key]
+        }
+        set {
+            guard let key = keys.first(where: { ($0 - key).magnitude.isZero }) else { return }
+            
+            self[key] = newValue
+        }
+    }
+}
+
+
 struct BoundaryValue: Hashable, Comparable {
     
     // MARK: - Type properties

@@ -11,7 +11,7 @@
 		215A0FB228463B25002C8DED /* Advection1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215A0FB128463B25002C8DED /* Advection1D.swift */; };
 		215A0FB628463CE5002C8DED /* Algorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 215A0FB528463CE5002C8DED /* Algorithm.swift */; };
 		216B5DF7284F72F70025025E /* Interpolated1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216B5DF6284F72F70025025E /* Interpolated1D.swift */; };
-		216B5DF9284F87DC0025025E /* BoundaryValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216B5DF8284F87DC0025025E /* BoundaryValue.swift */; };
+		216B5DF9284F87DC0025025E /* BoundaryValue+GridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216B5DF8284F87DC0025025E /* BoundaryValue+GridCell.swift */; };
 		21C6F86C2848C036005846C7 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F86B2848C036005846C7 /* Grid.swift */; };
 		21C6F86F2848C4EB005846C7 /* ArticleProfiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F86E2848C4EB005846C7 /* ArticleProfiles.swift */; };
 		21C6F8762848CDF6005846C7 /* PPM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C6F8752848CDF6005846C7 /* PPM.swift */; };
@@ -40,7 +40,7 @@
 		215A0FB128463B25002C8DED /* Advection1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Advection1D.swift; sourceTree = "<group>"; };
 		215A0FB528463CE5002C8DED /* Algorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithm.swift; sourceTree = "<group>"; };
 		216B5DF6284F72F70025025E /* Interpolated1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpolated1D.swift; sourceTree = "<group>"; };
-		216B5DF8284F87DC0025025E /* BoundaryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundaryValue.swift; sourceTree = "<group>"; };
+		216B5DF8284F87DC0025025E /* BoundaryValue+GridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BoundaryValue+GridCell.swift"; sourceTree = "<group>"; };
 		21C6F86B2848C036005846C7 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		21C6F86E2848C4EB005846C7 /* ArticleProfiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleProfiles.swift; sourceTree = "<group>"; };
 		21C6F8752848CDF6005846C7 /* PPM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPM.swift; sourceTree = "<group>"; };
@@ -113,7 +113,7 @@
 			children = (
 				21E8255D291C3BB200A918CA /* Constants.swift */,
 				21C6F86B2848C036005846C7 /* Grid.swift */,
-				216B5DF8284F87DC0025025E /* BoundaryValue.swift */,
+				216B5DF8284F87DC0025025E /* BoundaryValue+GridCell.swift */,
 				21E8255B291C366900A918CA /* Matrix.swift */,
 				214194E0290FBBC400E6A496 /* Algorithm */,
 			);
@@ -240,7 +240,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				21C6F86F2848C4EB005846C7 /* ArticleProfiles.swift in Sources */,
-				216B5DF9284F87DC0025025E /* BoundaryValue.swift in Sources */,
+				216B5DF9284F87DC0025025E /* BoundaryValue+GridCell.swift in Sources */,
 				21C6F8762848CDF6005846C7 /* PPM.swift in Sources */,
 				215A0FB628463CE5002C8DED /* Algorithm.swift in Sources */,
 				21C6F8782848CDFB005846C7 /* PPML.swift in Sources */,
