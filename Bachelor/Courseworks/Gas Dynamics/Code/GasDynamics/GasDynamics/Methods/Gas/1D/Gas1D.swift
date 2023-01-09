@@ -7,6 +7,38 @@
 
 import Foundation
 
+protocol ArrayToVariableConverable {
+    
+    var values: [Double] { get set }
+    
+    init(vector: [Double])
+}
+
+extension ArrayToVariableConverable {
+    
+    // MARK: - Type methods
+    
+    static func *(l: [Double], v: Self) -> Double { l * v.values }
+    
+    static func *(v: Self, r: [Double]) -> Double { v.values * r }
+    
+    static func *(v: Self, x: Double) -> Self { Self(vector: v.values * x) }
+    
+    static func *(x: Double, v: Self) -> Self { Self(vector: x * v.values) }
+
+    static func *=(v: inout Self, x: Double) { v.values *= x }
+
+    static func *=(x: Double, v: inout Self) { v.values *= x }
+
+    static func +(v1: Self, v2: Self) -> Self { Self(vector: v1.values + v2.values) }
+
+    static func +=(v1: inout Self, v2: Self) { v1.values += v2.values }
+
+    static func -=(v1: inout Self, v2: Self) { v1.values -= v2.values }
+
+    static func -(v1: Self, v2: Self) -> Self { Self(vector: v1.values - v2.values) }
+}
+
 final class Gas1D: JSONConvertableAlgorithm {
     
     // MARK: - Nested types
@@ -17,86 +49,40 @@ final class Gas1D: JSONConvertableAlgorithm {
     typealias Solution = [Time: Mesh]
     typealias EigenCell = [Time: EigenMesh]
     
-    struct V: Hashable {
+    struct V: ArrayToVariableConverable, Hashable {
         
         // MARK: - Type properties
         
         static let zero = V(density: .zero, speed: .zero, pressure: .zero)
         
-        // MARK: - Type methods
-        
-        static func makeFrom(alpha: Double, eigen vector: [Double]) -> V {
-            return Gas1D.V(density: alpha * vector[0], speed: alpha * vector[1], pressure: alpha * vector[2])
-        }
-        
-        static func *(l: [Double], v: V) -> Double {
-            return l[0] * v.density + l[1] * v.speed + l[2] * v.pressure
-        }
-        
-        static func *(v: V, r: [Double]) -> Double {
-            return r * v
-        }
-        
-        static func *(v: V, x: Double) -> V {
-            return V(density: v.density * x, speed: v.speed * x, pressure: v.pressure * x)
-        }
-        
-        static func *(x: Double, v: V) -> V {
-            return v * x
-        }
-        
-        static func *=(v: inout V, x: Double) {
-            v.density *= x
-            v.speed *= x
-            v.pressure *= x
-        }
-        
-        static func *=(x: Double, v: inout V) {
-            v *= x
-        }
-        
-        static func +(v1: V, v2: V) -> V {
-            return V(density: v1.density + v2.density, speed: v1.speed + v2.speed, pressure: v1.pressure + v2.pressure)
-        }
-        
-        static func +=(v1: inout V, v2: V) {
-            v1.density += v2.density
-            v1.speed += v2.speed
-            v1.pressure += v2.pressure
-        }
-        
-        static func -=(v1: inout V, v2: V) {
-            v1.density -= v2.density
-            v1.speed -= v2.speed
-            v1.pressure -= v2.pressure
-        }
-        
-        static func -(v1: V, v2: V) -> V {
-            return V(density: v1.density - v2.density, speed: v1.speed - v2.speed, pressure: v1.pressure - v2.pressure)
-        }
-        
         // MARK: - Internal properties
         
-        var density : Double
-        var speed   : Double
-        var pressure: Double
+        var values: [Double]
         
-        var plain: [Double] { [density, speed, pressure] }
+        var density: Double { values[0] }
+        var speed: Double { values[1] }
+        var pressure: Double { values[2] }
         
-        public init(density: Double, speed: Double, pressure: Double) {
-            self.density = density
-            self.speed = speed
-            self.pressure = pressure
+        // MARK: - Initializers
+                
+        public init(conservative u: U, gamma: Double = Constants.gamma) {
+            let density = u.u1
+            let speed = u.u2 / u.u1
+            let _energy = u.u3 - 0.5 * density * speed * speed
+            
+            self.init(density: density, speed: speed, pressure: _energy * (gamma - 1))
         }
         
-        public init(vector: [Double]) {
-            self.density = vector[0]
-            self.speed = vector[1]
-            self.pressure = vector[2]
+        public init(density: Double, speed: Double, pressure: Double) {
+            self.init(vector: [density, speed, pressure])
+        }
+        
+        init(vector: [Double]) {
+            self.values = vector
         }
     }
     
-    struct U: Hashable {
+    struct U: ArrayToVariableConverable, Hashable {
         
         // MARK: - Type properties
         
@@ -104,17 +90,17 @@ final class Gas1D: JSONConvertableAlgorithm {
         
         // MARK: - Internal properties
         
+        var values: [Double]
+        
         /// - rho
-        var u1: Double
+        var u1: Double { values[0] }
         
         /// - rho * u
-        var u2: Double
+        var u2: Double { values[1] }
         
         /// - E
-        var u3 : Double
-        
-        var plain: [Double] { [u1, u2, u3] }
-        
+        var u3 : Double { values[2] }
+                
         public init(physical v: V, gamma: Double = Constants.gamma) {
             self.init(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
         }
@@ -127,66 +113,34 @@ final class Gas1D: JSONConvertableAlgorithm {
             )
         }
         
-        public init(vector: [Double]) {
-            self.init(u1: vector[0], u2: vector[1], u3: vector[2])
+        public init(u1: Double, u2: Double, u3: Double) {
+            self.init(vector: [u1, u2, u3])
         }
         
-        public init(u1: Double, u2: Double, u3: Double) {
-            self.u1 = u1
-            self.u2 = u2
-            self.u3 = u3
+        init(vector: [Double]) {
+            self.values = vector
         }
     }
     
-    struct F {
+    struct F: ArrayToVariableConverable, Hashable {
         
         // MARK: - Type properties
         
         static let zero = F(f1: .zero, f2: .zero, f3: .zero)
         
-        // MARK: - Operators
-        
-        static func +(lhs: F, rhs: F) -> F {
-            return F(f1: lhs.f1 + rhs.f1, f2: lhs.f2 + rhs.f2, f3: lhs.f3 + rhs.f3)
-        }
-        
-        static func -(lhs: F, rhs: F) -> F {
-            return F(f1: lhs.f1 - rhs.f1, f2: lhs.f2 - rhs.f2, f3: lhs.f3 - rhs.f3)
-        }
-        
-        static func *(x: Double, f: F) -> F {
-            return F(f1: x * f.f1, f2: x * f.f2, f3: x * f.f3)
-        }
-        
-        static func *(f: F, x: Double) -> F {
-            return x * f
-        }
-        
-        static func +=(lhs: inout F, rhs: F) {
-            lhs.f1 += rhs.f1
-            lhs.f2 += rhs.f2
-            lhs.f3 += rhs.f3
-        }
-        
-        static func -=(lhs: inout F, rhs: F) {
-            lhs.f1 -= rhs.f1
-            lhs.f2 -= rhs.f2
-            lhs.f3 -= rhs.f3
-        }
-        
         // MARK: - Internal properties
         
+        var values: [Double]
+        
         /// - rho * u
-        var f1: Double
+        var f1: Double { values[0] }
         
         /// - rho * u^2 + p
-        var f2: Double
+        var f2: Double { values[1] }
         
         /// - (E + p) * u
-        var f3: Double
-        
-        var plain: [Double] { [f1, f2, f3] }
-        
+        var f3: Double { values[2] }
+                
         public init(physical v: V, gamma: Double = Constants.gamma) {
             self.init(density: v.density, speed: v.speed, pressure: v.pressure, gamma: gamma)
         }
@@ -206,14 +160,12 @@ final class Gas1D: JSONConvertableAlgorithm {
             )
         }
         
-        public init(vector: [Double]) {
-            self.init(f1: vector[0], f2: vector[1], f3: vector[2])
+        private init(f1: Double, f2: Double, f3: Double) {
+            self.init(vector: [f1, f2, f3])
         }
         
-        private init(f1: Double, f2: Double, f3: Double) {
-            self.f1 = f1
-            self.f2 = f2
-            self.f3 = f3
+        init(vector: [Double]) {
+            self.values = vector
         }
     }
     
@@ -268,25 +220,25 @@ final class Gas1D: JSONConvertableAlgorithm {
         
         solution[t] = space.nodes().reduce(into: Mesh()) { mesh, node in
             let xL = BoundaryValue(value: node - space.halfed, side: .right)
-            let x  = BoundaryValue(value: node, side: .middle)
-            let xR = BoundaryValue(value: node + space.halfed, side: .left)
             let vL = v0(xL.value)
-            let v = v0(x.value)
-            let vR = v0(xR.value)
-            
             mesh[xL] = vL
-            mesh[x]  = v
-            mesh[xR] = vR
             
+            let x  = BoundaryValue(value: node, side: .middle)
+            let v = v0(x.value)
+            mesh[x] = v
             eigenCell[t]?[x] = Eigen.system(physical: v, gamma: gamma)
+            
+            let xR = BoundaryValue(value: node + space.halfed, side: .left)
+            let vR = v0(xR.value)
+            mesh[xR] = vR
         }
-                
+        
         while t < T {
             guard let meshP = solution[t] else { assertionFailure("Time iteration error"); return }
             
             let tau = tau(average: Set(meshP.filter{ $0.key.side == .middle}.values))
             
-            guard tau.isNormal && tau > 0 else { return }
+            guard tau.isNormal && tau > 0 else { fatalError() }
             
             let tP = t
             t += tau
@@ -294,7 +246,7 @@ final class Gas1D: JSONConvertableAlgorithm {
             eigenCell[t] = [:]
             
             print("-------\(t)-------")
-            
+                        
             space.nodes().forEach { node in
                 let x = BoundaryValue(value: node, side: .middle)
                 
@@ -320,14 +272,15 @@ final class Gas1D: JSONConvertableAlgorithm {
                     xPL: xPL, xP: xP, xPR: xPR,
                     xNL: xL, xN: x, xNR: xR
                 )
-                                
+                
                 solution[t]?[xL] = vL
                 solution[t]?[xR] = vR
                 
                 let u = U(physical: v, gamma: gamma)
-                let newUVector = u.plain - tau / space.step * (flowR - flowL).plain
-                let invM = Eigen.InvM(conservative: U(vector: newUVector), gamma: gamma)
-                let newV = V(vector: invM * newUVector)
+                let newU = U(vector: u.values - tau / space.step * (flowR - flowL).values)
+                let newV = V(conservative: newU, gamma: gamma)
+                
+                guard newV.values.allSatisfy({ $0.isFinite }) else { fatalError() }
                 
                 eigenCell[t]?[x] = Eigen.system(physical: newV, gamma: gamma)
                 solution[t]?[x] = newV
@@ -340,7 +293,7 @@ final class Gas1D: JSONConvertableAlgorithm {
     private func tau(average vSet: Set<V>) -> Double {
         let maxLamba = vSet.map {
             let c = Constants.speedOfSound(physical: $0, gamma: gamma)
-            return max(abs($0.speed + c), abs($0.speed - c))
+            return abs($0.speed + c)
         }.max()!
         
         return Constants.sigmaGas * space.step / maxLamba
@@ -360,48 +313,8 @@ final class Gas1D: JSONConvertableAlgorithm {
         xN : BoundaryValue,
         xNR: BoundaryValue
     ) -> (V, F) {
-        
-        let (VL, Vl): (V, V) = {
-            guard
-                let systemL = eigenCell[tP]?[safe: xP],
-                let vL = solution[tP]?[safe: xPL],
-                let v = solution[tP]?[safe: xP],
-                let vR = solution[tP]?[safe: xPR]
-            else {
-                let vl = v0(space.start)
-                
-                return (vl, vl)
-            }
-            
-            guard !systemL.contains(where: { $0.lambda.isZero }) else {
-                let vl = solution[tP]?[safe: xPR] ?? .zero
-                
-                return (vl, vl)
-            }
-            
-            return leftSidePair(system: systemL, tau: tau, xL: xPL, x: xP, xR: xPR, vL: vL, v: v, vR: vR)
-        }()
-        
-        let (VR, Vr): (V, V) = {
-            guard
-                let systemR = eigenCell[tP]?[safe: xN],
-                let vL = solution[tP]?[safe: xNL],
-                let v = solution[tP]?[safe: xN],
-                let vR = solution[tP]?[safe: xNR]
-            else {
-                let vr = v0(space.end)
-                
-                return (vr, vr)
-            }
-            
-            guard !systemR.contains(where: { $0.lambda.isZero }) else {
-                let vl = solution[tP]?[safe: xNR] ?? .zero
-                
-                return (vl, vl)
-            }
-
-            return rightSidePair(system: systemR, tau: tau, xL: xNL, x: xN, xR: xNR, vL: vL, v: v, vR: vR)
-        }()
+        let (VL, Vl) = leftSidePair(tP: tP, tau: tau, xL: xPL, xM: xP, xR: xPR)
+        let (VR, Vr) = rightSidePair(tP: tP, tau: tau, xL: xNL, xM: xN, xR: xNR)
         
         let vStar = vStar(vL: VL, vR: VR)
         let systemVStar = Eigen.system(physical: vStar, gamma: gamma)
@@ -409,16 +322,16 @@ final class Gas1D: JSONConvertableAlgorithm {
         var newBoundaryV = 0.5 * (VL + VR)
         var flow = 0.5 * (F(physical: Vl, gamma: gamma) + F(physical: Vr, gamma: gamma))
         
-        guard !systemVStar.contains(where: { $0.lambda.isZero }) else {
-            return (newBoundaryV, flow)
-        }
+//        guard !systemVStar.contains(where: { $0.lambda.isZero }) else {
+//            return (newBoundaryV, flow)
+//        }
         
         let M = Eigen.M(physical: vStar, gamma: gamma)
         
         systemVStar.forEach { system in
             let vp = 0.5 * V(vector: (system.l * vStar) * system.r)
-    
-            if system.lambda > 0 {
+
+            if system.lambda >= 0 {
                 newBoundaryV += vp
             } else {
                 newBoundaryV -= vp
@@ -431,33 +344,44 @@ final class Gas1D: JSONConvertableAlgorithm {
     }
     
     private func leftSidePair(
-        system systemP: [Eigen.System],
+        tP: Double,
         tau: Double,
         xL: BoundaryValue,
-        x: BoundaryValue,
-        xR: BoundaryValue,
-        vL: V,
-        v: V,
-        vR: V
-    ) -> (V, V) {
+        xM: BoundaryValue,
+        xR: BoundaryValue
+    ) -> (forBoundary: V, forFlow: V) {
+        guard
+            let systemP = eigenCell[tP]?[safe: xM],
+            let vL = solution[tP]?[safe: xL],
+            let vM = solution[tP]?[safe: xM],
+            let vR = solution[tP]?[safe: xR]
+        else {
+            let vl = v0(space.start)
+            
+            return (vl, vl)
+        }
+        
         guard
             let maxSystemP = systemP.last,
             maxSystemP.lambda > 0
-        else { return (.zero, .zero) }
+        else {
+            return (.zero, .zero)
+        }
         
         let averageVL = averageBoundaryVp(
-            tau: tau, system: maxSystemP, boundary: xR,
-            xL: xL, x: x, xR: xR,
-            vL: vL, v: v, vR: vR
+            tau: tau, system: maxSystemP,
+            xL: xL, xR: xR,
+            vL: vL, vM: vM, vR: vR,
+            boundaryX: xR, boundaryV: vR
         )
-                
+
         /// for boundary
         let VL = systemP.reduce(into: V.zero) { result, system in
             guard system.lambda > 0 else { return () }
             
             let x = shifted(x: xR.value, lambda: system.lambda, tau: tau)
-            let vp = Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
-            
+            let vp = V(vector: (system.l * Nv(x: x, xL: xL.value, vL: vL, vM: vM, vR: vR)) * system.r)
+                        
             result += vp
         }
         
@@ -466,44 +390,58 @@ final class Gas1D: JSONConvertableAlgorithm {
             guard system.lambda > 0 else { return () }
             
             let averageVp = averageBoundaryVp(
-                tau: tau, system: system, boundary: xR,
-                xL: xL, x: x, xR: xR,
-                vL: vL, v: v, vR: vR
+                tau: tau, system: system,
+                xL: xL, xR: xR,
+                vL: vL, vM: vM, vR: vR,
+                boundaryX: xR, boundaryV: vR
             )
-                        
+
             result += V(vector: system.r * (system.l * (averageVp - averageVL)))
         }
+        
+        guard VL.values.allSatisfy({ $0.isNormal }), Vl.values.allSatisfy({ $0.isNormal }) else { fatalError() }
         
         return (VL, Vl)
     }
     
     private func rightSidePair(
-        system systemP: [Eigen.System],
+        tP: Double,
         tau: Double,
         xL: BoundaryValue,
-        x: BoundaryValue,
-        xR: BoundaryValue,
-        vL: V,
-        v: V,
-        vR: V
-    ) -> (V, V) {
+        xM: BoundaryValue,
+        xR: BoundaryValue
+    ) -> (forBoundary: V, forFlow: V) {
+        guard
+            let systemP = eigenCell[tP]?[safe: xM],
+            let vL = solution[tP]?[safe: xL],
+            let vM = solution[tP]?[safe: xM],
+            let vR = solution[tP]?[safe: xR]
+        else {
+            let vr = v0(space.end)
+            
+            return (vr, vr)
+        }
+        
         guard
             let minSystemP = systemP.first,
             minSystemP.lambda < 0
-        else { return (.zero, .zero) }
+        else {
+            return (.zero, .zero)
+        }
 
         let averageVR = averageBoundaryVp(
-            tau: tau, system: minSystemP, boundary: xL,
-            xL: xL, x: x, xR: xR,
-            vL: vL, v: v, vR: vR
+            tau: tau, system: minSystemP,
+            xL: xL, xR: xR,
+            vL: vL, vM: vM, vR: vR,
+            boundaryX: xL, boundaryV: vL
         )
         
         /// for boundary
         let VR = systemP.reduce(into: V.zero) { result, system in
             guard system.lambda < 0 else { return () }
-                        
+
             let x = shifted(x: xL.value, lambda: system.lambda, tau: tau)
-            let vp = Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: v, vR: vR)
+            let vp = Nvp(x: x, system: system, xL: xL.value, vL: vL, vM: vM, vR: vR)
             
             result += vp
         }
@@ -513,25 +451,28 @@ final class Gas1D: JSONConvertableAlgorithm {
             guard system.lambda < 0 else { return () }
             
             let averageVp = averageBoundaryVp(
-                tau: tau, system: system, boundary: xL,
-                xL: xL, x: x, xR: xR,
-                vL: vL, v: v, vR: vR
+                tau: tau, system: system,
+                xL: xL, xR: xR,
+                vL: vL, vM: vM, vR: vR,
+                boundaryX: xL, boundaryV: vL
             )
-
+            
             result += V(vector: system.r * ((averageVp - averageVR) * system.l))
         }
+        
+        guard VR.values.allSatisfy({ $0.isNormal }), Vr.values.allSatisfy({ $0.isNormal }) else { fatalError() }
         
         return (VR, Vr)
     }
     
     private func vStar(vL: V, vR: V) -> V {
-        guard !vL.density.isZero else {
-            return vR
-        }
-        
-        guard !vR.density.isZero else {
-            return vL
-        }
+//        guard !vL.density.isZero else {
+//            return vR
+//        }
+//
+//        guard !vR.density.isZero else {
+//            return vL
+//        }
         
         let sqrtDensityL = sqrt(vL.density)
         let sqrtDensityR = sqrt(vR.density)
@@ -551,34 +492,31 @@ final class Gas1D: JSONConvertableAlgorithm {
     private func averageBoundaryVp(
         tau: Double,
         system: Eigen.System,
-        boundary: BoundaryValue,
         xL: BoundaryValue,
-        x: BoundaryValue,
         xR: BoundaryValue,
         vL: V,
-        v: V,
-        vR: V
+        vM: V,
+        vR: V,
+        boundaryX: BoundaryValue,
+        boundaryV: V
     ) -> V {
-        guard !system.lambda.isZero else { return .zero }
-        
+        guard !system.lambda.isZero else {
+            return V(vector: (system.l * boundaryV) * system.r)
+        }
+
         let delta = system.lambda * tau
-        let shiftedX = shifted(x: boundary.value, lambda: system.lambda, tau: tau)
+        let shiftedX = shifted(x: boundaryX.value, lambda: system.lambda, tau: tau)
         
-        let alphaLp = alpha(v: vL, l: system.l)
-        let alphaMp = alpha(v: v, l: system.l)
-        let alphaRp = alpha(v: vR, l: system.l)
+        let v1 = Nv(x: shiftedX, xL: xL.value, vL: vL, vM: vM, vR: vR)
+        let v2 = Nv(x: shiftedX + 0.5 * delta, xL: xL.value, vL: vL, vM: vM, vR: vR)
+        let v3 = Nv(x: shiftedX + delta, xL: xL.value, vL: vL, vM: vM, vR: vR)
         
-        let alpha1 = NalphaP(x: shiftedX, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-        let alpha2 = NalphaP(x: shiftedX + 0.5 * delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-        let alpha3 = NalphaP(x: shiftedX + delta, xL: xL.value, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
-        
-        return V(vector: (1 / 6 * (alpha1 + 4 * alpha2 + alpha3)) * system.r)
+        return 1 / 6 * (v1 + 4 * v2 + v3)
     }
     
     private func Nv(
         t: Double,
         x: Double,
-        system: [Eigen.System],
         xL: BoundaryValue,
         xM: BoundaryValue,
         xR: BoundaryValue
@@ -589,82 +527,71 @@ final class Gas1D: JSONConvertableAlgorithm {
             let vR = solution[t]?[xR]
         else { return .zero }
         
-        return Nv(x: x, system: system, xL: xL.value, vL: vL, vM: vM, vR: vR)
+        return Nv(x: x, xL: xL.value, vL: vL, vM: vM, vR: vR)
     }
     
     private func Nv(
         x: Double,
-        system: [Eigen.System],
         xL: Double,
         vL: V,
         vM: V,
         vR: V
     ) -> V {
-        return system.reduce(into: V.zero) { result, system in
-            result += Nvp(x: x, system: system, xL: xL, vL: vL, vM: vM, vR: vR)
-        }
-    }
-    
-    private func Nvp(
-        x: Double,
-        system: Eigen.System,
-        xL: Double,
-        vL: V,
-        vM: V,
-        vR: V
-    ) -> V {
-        let alphaLp = alpha(v: vL, l: system.l)
-        let alphaMp = alpha(v: vM, l: system.l)
-        let alphaRp = alpha(v: vR, l: system.l)
+        let xi = xi(x: x, xL: xL)
         
-        return Nvp(x: x, system: system, xL: xL, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp)
+        return V(
+            density: NVar(x: x, xL: xL, xi: xi, varL: vL.density, varM: vM.density, varR: vR.density),
+            speed: NVar(x: x, xL: xL, xi: xi, varL: vL.speed, varM: vM.speed, varR: vR.speed),
+            pressure: NVar(x: x, xL: xL, xi: xi, varL: vL.pressure, varM: vM.pressure, varR: vR.pressure)
+        )
     }
     
-    private func Nvp(
-        x: Double,
-        system: Eigen.System,
-        xL: Double,
-        alphaLp: Double,
-        alphaMp: Double,
-        alphaRp: Double
-    ) -> V {
-        return V(vector: NalphaP(x: x, xL: xL, alphaLp: alphaLp, alphaMp: alphaMp, alphaRp: alphaRp) * system.r)
-    }
-    
-    private func NalphaP(
+    private func NVar(
         x: Double,
         xL: Double,
-        alphaLp: Double,
-        alphaMp: Double,
-        alphaRp: Double
+        varL: Double,
+        varM: Double,
+        varR: Double
     ) -> Double {
         let xi = xi(x: x, xL: xL)
-        let delta = delta(alphaL: alphaLp, alphaR: alphaRp)
-        let sixth = sixth(alphaL: alphaLp, alphaM: alphaMp, alphaR: alphaRp)
         
-        return NalphaP(x: x, alphaLp: alphaLp, xi: xi, delta: delta, sixth: sixth)
+        return NVar(x: x, xL: xL, xi: xi, varL: varL, varM: varM, varR: varR)
     }
     
-    private func NalphaP(
+    private func NVar(
         x: Double,
-        alphaLp: Double,
+        xL: Double,
+        xi: Double,
+        varL: Double,
+        varM: Double,
+        varR: Double
+    ) -> Double {
+        let delta = delta(varL: varL, varR: varR)
+        let sixth = sixth(varL: varL, varM: varM, varR: varR)
+        
+        return NVar(x: x, varL: varL, xi: xi, delta: delta, sixth: sixth)
+    }
+    
+    private func NVar(
+        x: Double,
+        varL: Double,
         xi: Double,
         delta: Double,
         sixth: Double
     ) -> Double {
-        return alphaLp +  xi * (delta + sixth * (1.0 - xi))
+        return varL +  xi * (delta + sixth * (1.0 - xi))
     }
     
     private func xi(x: Double, xL: Double) -> Double {
         return (x - xL) / space.step
     }
     
-    private func delta(alphaL: Double, alphaR: Double) -> Double {
-        return alphaR - alphaL
+    private func delta(varL: Double, varR: Double) -> Double {
+        return varR - varL
     }
     
-    private func sixth(alphaL: Double, alphaM: Double, alphaR: Double) -> Double {
-        return 6.0 * (alphaM - 0.5 * (alphaR + alphaL))
+    private func sixth(varL: Double, varM: Double, varR: Double) -> Double {
+        return 6.0 * (varM - 0.5 * (varR + varL))
     }
     
     private func shifted(x: Double, lambda: Double, tau: Double) -> Double {
@@ -699,7 +626,7 @@ extension Gas1D {
             pressure: Double,
             gamma: Double = Constants.gamma
         ) -> Double {
-            return (pressure * gamma / (gamma - 1) + density * speed * speed / 2) / density
+            return pressure * gamma / (density * (gamma - 1)) + 0.5 * speed * speed
         }
         
         static func enthalpy(physical v: V, gamma: Double = Constants.gamma) -> Double {
@@ -817,15 +744,15 @@ extension Gas1D {
             guard !density.isZero else { fatalError() }
             
             var result = Matrix(n: 3, initial: 0)
-
+            
             result[0,0] = 1
             result[0,1] = 0
             result[0,2] = 0
-
+            
             result[1,0] = speed
             result[1,1] = density
             result[1,2] = 0
-
+            
             result[2,0] = speed * speed / 2
             result[2,1] = density * speed
             result[2,2] = 1 / (gamma - 1)
@@ -843,15 +770,15 @@ extension Gas1D {
             gamma: Double = Constants.gamma
         ) -> Matrix {
             var result = Matrix(n: 3, initial: 0)
-
+            
             result[0,0] = 1
             result[0,1] = 0
             result[0,2] = 0
-
+            
             result[1,0] = -speed / density
             result[1,1] = 1 / density
             result[1,2] = 0
-
+            
             result[2,0] = speed * speed / 2 * (gamma - 1)
             result[2,1] = -speed * (gamma - 1)
             result[2,2] = gamma - 1
@@ -877,24 +804,24 @@ extension Gas1D {
                 let xL = BoundaryValue(value: node - space.halfed, side: .right)
                 let x  = BoundaryValue(value: node, side: .middle)
                 let xR = BoundaryValue(value: node + space.halfed, side: .left)
-
+                
                 guard
                     let vL = solution[t]?[xL],
                     let v  = solution[t]?[x],
                     let vR = solution[t]?[xR],
                     let system = eigenCell[t]?[safe: x]
                 else { return }
-
+                
                 mesh[String(xL.value)] = String(vL.density)
                 mesh[String(x.value)] = String(v.density)
                 mesh[String(xR.value)] = String(vR.density)
-
-//                let step = space.step / 20
-//                for k in stride(from: xL.value + step, to: xR.value, by: step) {
-//                    let vK = Nv(t: t, x: k, system: system, xL: xL, xM: x, xR: xR)
-//
-//                    mesh[String(k)] = String(vK.density)
-//                }
+                
+                //                let step = space.step / 20
+                //                for k in stride(from: xL.value + step, to: xR.value, by: step) {
+                //                    let vK = Nv(t: t, x: k, system: system, xL: xL, xM: x, xR: xR)
+                //
+                //                    mesh[String(k)] = String(vK.density)
+                //                }
             }
         }
         

@@ -122,8 +122,12 @@ extension Array where Element == Double {
         return right * left
     }
     
-    static func +=(left: inout Self, right: Self) {
-        right.enumerated().forEach { left[$0.offset] += $0.element }
+    static func *=(left: Double, right: inout Self) {
+        right.indices.forEach{ index in right[index] *= left }
+    }
+    
+    static func *=(left: inout Self, right: Double) {
+        right *= left
     }
     
     static func +(left: Self, right: Self) -> Self {
@@ -136,6 +140,10 @@ extension Array where Element == Double {
         return result
     }
     
+    static func +=(left: inout Self, right: Self) {
+        right.enumerated().forEach { left[$0.offset] += $0.element }
+    }
+    
     static func -(left: Self, right: Self) -> Self {
         var result = Array(repeating: 0, count: left.count)
         
@@ -144,5 +152,9 @@ extension Array where Element == Double {
         }
         
         return result
+    }
+    
+    static func -=(left: inout Self, right: Self) {
+        right.enumerated().forEach { left[$0.offset] -= $0.element }
     }
 }

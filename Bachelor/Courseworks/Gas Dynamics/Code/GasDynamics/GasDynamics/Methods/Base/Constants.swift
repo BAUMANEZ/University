@@ -14,7 +14,7 @@ enum Constants {
     // MARK: - Gas
     
     static let gamma: Double = 1.4
-    static let sigmaGas: Double = 0.95
+    static let sigmaGas: Double = 0.5
     
     static func speedOfSound(density: Double, pressure: Double, gamma: Double = Constants.gamma) -> Double {
         return sqrt(gamma * pressure / density)
