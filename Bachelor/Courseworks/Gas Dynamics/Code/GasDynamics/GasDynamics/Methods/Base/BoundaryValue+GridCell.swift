@@ -50,6 +50,22 @@ extension Dictionary where Key == Double {
     }
 }
 
+extension Dictionary where Key == GridCell {
+    
+    subscript(safe key: Key) -> Value? {
+        get {
+            guard let key = keys.first(where: { ($0.value - key.value).magnitude.isZero }) else { return nil }
+            
+            return self[key]
+        }
+        set {
+            guard let key = keys.first(where: { ($0.value - key.value).magnitude.isZero }) else { return }
+            
+            self[key] = newValue
+        }
+    }
+}
+
 
 struct BoundaryValue: Hashable, Comparable {
     
